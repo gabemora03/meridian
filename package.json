@@ -1,0 +1,31 @@
+{
+  "name": "meridian-ai",
+  "version": "0.9.0",
+  "private": true,
+  "description": "Meridian AI Governance Platform",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
+    "dev:api": "cd services/api && npm run dev",
+    "dev:app": "npx serve apps/app -l 3000",
+    "build": "npm run build --workspaces",
+    "test": "jest --passWithNoTests",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "db:migrate": "cd services/api && npx prisma migrate dev",
+    "db:studio": "cd services/api && npx prisma studio",
+    "db:generate": "cd services/api && npx prisma generate"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "serve": "^14.2.0",
+    "typescript": "^5.3.0"
+  }
+}

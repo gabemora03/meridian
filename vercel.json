@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "meridian-ai",
+  "builds": [
+    {
+      "src": "apps/app/index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "apps/web/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/app/(.*)",
+      "dest": "/apps/app/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/web/$1"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@meridian-api-url",
+    "VITE_WS_URL": "@meridian-ws-url"
+  }
+}

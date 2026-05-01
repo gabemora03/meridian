@@ -1,0 +1,210 @@
+// Meridian database schema
+// Run: npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── CORE AI SYSTEM REGISTRY ──────────────────────────────────────────────
+
+model AiSystem {
+  id                String   @id @default(cuid())
+  name              String
+  type              SystemType
+  description       String?
+  owner             String
+  status            String   @default("active") // active | review | deprecated | shadow
+  riskLevel         String?  // critical | high | medium | low
+  biasScore         Float?
+  privacyScore      Float?
+  complianceCoverage Float?
+  deployedInEU      Boolean  @default(false)
+  isHighRisk        Boolean  @default(false)
+  modelCardUrl      String?
+  metadata          Json     @default("{}")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  agents            Agent[]
+  riskAssessments   RiskAssessment[]
+  incidents         Incident[]
+  evidenceMappings  EvidenceMapping[]
+  
+  @@index([status])
+  @@index([riskLevel])
+}
+
+enum SystemType {
+  MODEL
+  AGENT
+  APPLICATION
+}
+
+// ─── AGENT REGISTRY ───────────────────────────────────────────────────────
+
+model Agent {
+  id              String   @id @default(cuid())
+  name            String
+  systemId        String
+  system          AiSystem @relation(fields: [systemId], references: [id])
+  type            String   // governance | operational | shadow
+  status          String   @default("active") // active | idle | blocked | killed
+  autonomyLevel   Int      @default(1) // 1-4
+  permissions     Json     @default("[]")
+  policies        Json     @default("[]")
+  dnaBaseline     Json?    // AgentDNA™ action distribution baseline
+  dnaScore        Float?   // Current JS divergence
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  actions         AgentAction[]
+  
+  @@index([systemId])
+  @@index([status])
+}
+
+model AgentAction {
+  id             String   @id @default(cuid())
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+  actionType     String
+  resource       String?
+  payload        Json     @default("{}")
+  allowed        Boolean
+  policyViolation String?  // policyId if blocked
+  timestamp      DateTime @default(now())
+
+  @@index([agentId, timestamp])
+  @@index([allowed])
+}
+
+// ─── RISK ASSESSMENTS ─────────────────────────────────────────────────────
+
+model RiskAssessment {
+  id                String   @id @default(cuid())
+  systemId          String
+  system            AiSystem @relation(fields: [systemId], references: [id])
+  riskScore         Float    // 0-100
+  monetaryExposure  Float    // Expected annual loss USD
+  severity          String   // critical | high | medium | low
+  breakdown         Json     // monetary breakdown
+  recommendations   Json     // array of recommendations
+  qualitativeAnalysis String?
+  assessedAt        DateTime @default(now())
+  
+  @@index([systemId])
+  @@index([severity])
+}
+
+// ─── POLICIES ─────────────────────────────────────────────────────────────
+
+model Policy {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  policyCode      Json     // Full policy-as-code definition
+  enforcementMode String   // block | flag | modify
+  frameworks      String[] // EU-AI-ACT-ART-9, NIST-GOVERN-1.1, ...
+  status          String   @default("draft") // draft | review | active | deprecated
+  version         Int      @default(1)
+  createdBy       String
+  approvedBy      String?
+  generatedByAI   Boolean  @default(false)
+  naturalLanguage String?  // if AI-generated, the original NL input
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([status])
+}
+
+// ─── INCIDENTS ────────────────────────────────────────────────────────────
+
+model Incident {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  severity      String   // critical | high | medium | low
+  status        String   @default("open") // open | investigating | resolved | closed
+  systemId      String?
+  system        AiSystem? @relation(fields: [systemId], references: [id])
+  externalId    String?  // Jira/ServiceNow ticket ID
+  monetaryExposure Float?
+  affectedUsers Int?
+  slaHours      Int?     // SLA in hours
+  resolution    String?
+  rootCause     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  resolvedAt    DateTime?
+  
+  @@index([status])
+  @@index([severity])
+}
+
+// ─── EVIDENCE ─────────────────────────────────────────────────────────────
+
+model Evidence {
+  id           String   @id @default(cuid())
+  title        String
+  contentType  String
+  content      String?  // text content
+  storageUrl   String?  // S3/GCS URL for large files
+  frameworks   String[] // frameworks this evidence covers
+  systemIds    String[] // AI systems this evidence applies to
+  reuseCount   Int      @default(0)
+  uploadedBy   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  mappings     EvidenceMapping[]
+}
+
+model EvidenceMapping {
+  id         String   @id @default(cuid())
+  evidenceId String
+  evidence   Evidence @relation(fields: [evidenceId], references: [id])
+  systemId   String
+  system     AiSystem @relation(fields: [systemId], references: [id])
+  controlId  String   // framework control ID
+  mappedAt   DateTime @default(now())
+  
+  @@unique([evidenceId, systemId, controlId])
+}
+
+// ─── AUDIT LOG ────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String   // enforce | assess | policy_update | incident_create | advisor_query
+  actorId   String?  // user or agent ID
+  actorType String?  // user | agent | system
+  resourceId String?
+  details   Json     @default("{}")
+  timestamp DateTime @default(now())
+  
+  @@index([action])
+  @@index([timestamp])
+  @@index([actorId])
+}
+
+// ─── VENDORS ──────────────────────────────────────────────────────────────
+
+model Vendor {
+  id           String   @id @default(cuid())
+  name         String
+  category     String   // llm_provider | infrastructure | saas | ...
+  riskScore    Float?
+  riskLevel    String?
+  complianceStatus String @default("pending") // compliant | review | non_compliant
+  documentsRequired String[]
+  documentsReceived String[]
+  reviewedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

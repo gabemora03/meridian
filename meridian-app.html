@@ -1,0 +1,2419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Meridian — AI Governance Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,200;1,9..144,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Surfaces */
+  --void:#06080f;--bg:#090c16;--s1:#0d1120;--s2:#121828;--s3:#182035;--s4:#1f2a40;
+  /* Borders */
+  --b0:rgba(191,255,0,.05);--b1:rgba(191,255,0,.11);--b2:rgba(191,255,0,.22);--b3:rgba(191,255,0,.4);
+  --bn:rgba(255,255,255,.06);--bn2:rgba(255,255,255,.12);
+  /* Accents */
+  --lime:#bfff00;--lime-d:rgba(191,255,0,.08);--lime-g:rgba(191,255,0,.18);
+  --red:#ff2d55;--red-d:rgba(255,45,85,.1);
+  --amb:#ff9f0a;--amb-d:rgba(255,159,10,.1);
+  --blu:#0a84ff;--blu-d:rgba(10,132,255,.1);
+  --pur:#bf5af2;--pur-d:rgba(191,90,242,.1);
+  --teal:#5ac8fa;--teal-d:rgba(90,200,250,.1);
+  /* Text */
+  --t1:#f0f4ff;--t2:#8090b8;--t3:#3a4a6a;--t4:#1e2840;
+  /* Fonts */
+  --fh:'Fraunces',Georgia,serif;--fm:'Space Mono',monospace;--fb:'DM Sans',sans-serif;
+  --sw:248px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.6;display:flex;min-height:100vh;overflow-x:hidden}
+
+/* Grid */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(191,255,0,.04),transparent),linear-gradient(rgba(191,255,0,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(191,255,0,.012) 1px,transparent 1px);background-size:100% 100%,56px 56px,56px 56px;pointer-events:none;z-index:0}
+
+/* ─── SIDEBAR ─── */
+.sb{width:var(--sw);min-height:100vh;background:var(--bg);border-right:1px solid var(--b0);position:fixed;top:0;left:0;z-index:200;display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:flex-start;gap:10px;flex-shrink:0}
+.sb-icon{width:32px;height:32px;background:var(--lime);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:14px;font-weight:700;color:var(--void);flex-shrink:0;margin-top:2px}
+.sb-brand{flex:1}
+.sb-name{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.4px;line-height:1}
+.sb-tag{font-family:var(--fm);font-size:8px;color:var(--lime);letter-spacing:.8px;margin-top:3px}
+
+.sb-q{margin:10px 12px 6px;position:relative}
+.sb-q input{width:100%;background:var(--s2);border:1px solid var(--bn);border-radius:6px;padding:7px 9px 7px 28px;font-size:12px;font-family:var(--fb);color:var(--t1);outline:none;transition:border-color .15s}
+.sb-q input::placeholder{color:var(--t3)}
+.sb-q input:focus{border-color:var(--b1)}
+.sb-qi{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:11px}
+.sb-qk{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-family:var(--fm);font-size:7.5px;color:var(--t3);background:var(--s3);border:1px solid var(--bn);border-radius:3px;padding:1px 4px}
+
+.sb-sec{padding:8px 10px 2px;flex-shrink:0}
+.sb-lbl{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1.6px;text-transform:uppercase;padding:0 4px;margin-bottom:3px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 4px;border-radius:6px;cursor:pointer;color:var(--t2);font-size:12.5px;transition:all .12s;margin-bottom:1px;user-select:none;border:1px solid transparent;position:relative}
+.ni:hover{background:var(--s2);color:var(--t1)}
+.ni.act{background:var(--lime-d);color:var(--lime);border-color:var(--b1)}
+.ni.act::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--lime);border-radius:0 2px 2px 0}
+.ni-i{width:15px;height:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.ni-b{margin-left:auto;font-family:var(--fm);font-size:9px;background:var(--red-d);color:var(--red);border:1px solid rgba(255,45,85,.2);border-radius:3px;padding:0 4px;min-width:16px;text-align:center}
+.ni-b.ok{background:var(--lime-d);color:var(--lime);border-color:var(--b1)}
+.ni-live{width:4px;height:4px;border-radius:50%;background:var(--lime);margin-left:auto;animation:bk 2s infinite}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.2}}
+
+.sb-div{height:1px;background:var(--b0);margin:6px 12px}
+.sb-ft{margin-top:auto;padding:12px 10px;border-top:1px solid var(--b0);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--bn)}
+.sb-av{width:28px;height:28px;background:linear-gradient(135deg,#0a84ff,#bf5af2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-uname{font-size:12.5px;font-weight:500}
+.sb-urole{font-size:10px;color:var(--t3)}
+
+/* ─── MAIN ─── */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;position:relative;z-index:1}
+
+/* ─── TOPBAR ─── */
+.tb{height:52px;background:rgba(9,12,22,.92);border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 22px;gap:11px;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+.tb-bc{font-family:var(--fh);font-size:13px;font-style:italic;color:var(--t2);letter-spacing:-.1px}
+.tb-bc span{color:var(--t1);font-style:normal;font-weight:600}
+.tb-sp{flex:1}
+.tb-live{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9.5px;color:var(--lime);background:var(--lime-d);border:1px solid var(--b1);border-radius:4px;padding:4px 8px}
+.tb-ldot{width:4px;height:4px;border-radius:50%;background:var(--lime);animation:bk 1.5s infinite}
+.tb-ico{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bn);border-radius:5px;cursor:pointer;color:var(--t2);font-size:13px;position:relative;transition:all .12s}
+.tb-ico:hover{border-color:var(--bn2);color:var(--t1)}
+.tb-notif{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg)}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:6px;border:1px solid var(--bn);background:transparent;color:var(--t2);font-size:12px;font-family:var(--fb);cursor:pointer;transition:all .12s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--bn2);color:var(--t1);background:var(--s2)}
+.tb-btn.p{background:var(--lime);color:var(--void);border-color:var(--lime);font-weight:600}
+.tb-btn.p:hover{background:#d4ff1a}
+
+/* ─── PAGES ─── */
+.page{display:none;padding:22px 22px 60px;animation:fi .18s ease}
+.page.act{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.ph h1{font-family:var(--fh);font-size:28px;font-weight:600;letter-spacing:-.8px;color:var(--t1);line-height:1;margin-bottom:3px}
+.ph h1 i{color:var(--lime);font-style:italic}
+.ph p{font-size:12.5px;color:var(--t2);max-width:520px;margin-top:2px}
+.ph-r{display:flex;gap:7px;align-items:center;flex-shrink:0}
+
+/* ─── KPI CARDS ─── */
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+.kc{background:var(--s1);border:1px solid var(--bn);border-radius:10px;padding:18px 18px 14px;position:relative;overflow:hidden;transition:all .15s;cursor:default}
+.kc:hover{border-color:var(--bn2);transform:translateY(-1px)}
+.kc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px}
+.kc.lime::after{background:linear-gradient(90deg,transparent,var(--lime),transparent)}
+.kc.red::after{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.kc.amb::after{background:linear-gradient(90deg,transparent,var(--amb),transparent)}
+.kc.blu::after{background:linear-gradient(90deg,transparent,var(--blu),transparent)}
+.kc.pur::after{background:linear-gradient(90deg,transparent,var(--pur),transparent)}
+.kc-lbl{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px}
+.kc-val{font-family:var(--fh);font-size:40px;font-weight:700;line-height:1;letter-spacing:-2px;margin-bottom:6px}
+.kc.lime .kc-val{color:var(--lime)}.kc.red .kc-val{color:var(--red)}.kc.amb .kc-val{color:var(--amb)}.kc.blu .kc-val{color:var(--blu)}.kc.pur .kc-val{color:var(--pur)}
+.kc-d{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:3px}
+.up{color:#30d158}.dn{color:var(--red)}
+
+/* ─── PANEL ─── */
+.pn{background:var(--s1);border:1px solid var(--bn);border-radius:10px;padding:18px;transition:border-color .15s}
+.pn:hover{border-color:var(--bn2)}
+.pnh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.pnt{font-family:var(--fh);font-size:14px;font-weight:600;letter-spacing:-.2px}
+.pns{font-size:11px;color:var(--t2);margin-top:2px}
+.va{font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer;letter-spacing:.2px;flex-shrink:0}
+
+/* ─── LAYOUTS ─── */
+.g2{display:grid;grid-template-columns:1.65fr 1fr;gap:11px;margin-bottom:14px}
+.g2e{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.cw{position:relative;width:100%;height:200px;margin-top:12px}
+
+/* ─── BADGES ─── */
+.bd{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-family:var(--fm);font-size:9.5px;white-space:nowrap}
+.bd.crit{background:var(--red-d);color:var(--red);border:1px solid rgba(255,45,85,.2)}
+.bd.hi{background:var(--amb-d);color:var(--amb);border:1px solid rgba(255,159,10,.2)}
+.bd.med{background:var(--blu-d);color:var(--blu);border:1px solid rgba(10,132,255,.18)}
+.bd.lo{background:var(--lime-d);color:var(--lime);border:1px solid var(--b1)}
+.bd.ok{background:rgba(48,209,88,.1);color:#30d158;border:1px solid rgba(48,209,88,.2)}
+.bd.rev{background:var(--amb-d);color:var(--amb);border:1px solid rgba(255,159,10,.2)}
+.bd.off{background:rgba(255,255,255,.04);color:var(--t3);border:1px solid var(--bn)}
+.bd.pur{background:var(--pur-d);color:var(--pur);border:1px solid rgba(191,90,242,.2)}
+.bd.live{background:var(--lime-d);color:var(--lime);border:1px solid var(--b1)}
+
+/* ─── TABLE ─── */
+.tw{overflow:auto;border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1.1px;text-transform:uppercase;text-align:left;padding:8px 11px;border-bottom:1px solid var(--bn);background:var(--s2);white-space:nowrap}
+tbody td{padding:9px 11px;border-bottom:1px solid var(--bn);color:var(--t2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--s2);cursor:pointer}
+tbody tr:hover td{color:var(--t1)}
+.tdn{color:var(--t1);font-weight:500}.tdm{font-family:var(--fm);font-size:11px}
+.td$${font-family:var(--fm);font-size:11.5px;color:var(--amb);font-weight:700}
+
+/* ─── RISK BAR ─── */
+.rb{display:flex;align-items:center;gap:7px}
+.rb-t{flex:1;height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
+.rb-f{height:100%;border-radius:99px}
+.rb-n{font-family:var(--fm);font-size:10px;color:var(--t2);min-width:22px;text-align:right}
+
+/* ─── WHY PANEL ─── */
+.why-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:3px;background:var(--blu-d);border:1px solid rgba(10,132,255,.18);color:var(--blu);font-family:var(--fm);font-size:8.5px;cursor:pointer;transition:all .12s}
+.why-btn:hover{background:rgba(10,132,255,.18)}
+.why-panel{background:var(--s2);border:1px solid rgba(10,132,255,.15);border-radius:7px;padding:13px;margin-top:7px;display:none}
+.why-panel.open{display:block}
+.why-title{font-family:var(--fm);font-size:8.5px;color:var(--blu);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.why-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11.5px}
+.why-factor{color:var(--t2);flex:1}
+.why-bar{width:76px;height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
+.why-fill{height:100%;border-radius:99px;background:var(--blu)}
+.why-pct{font-family:var(--fm);font-size:9.5px;color:var(--blu);min-width:30px;text-align:right}
+.why-conf{font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:7px;padding-top:7px;border-top:1px solid var(--bn)}
+
+/* ─── PREDICTIVE CARD ─── */
+.pred{background:linear-gradient(135deg,rgba(191,255,0,.06),rgba(10,132,255,.03));border:1px solid var(--b1);border-radius:10px;padding:18px;margin-bottom:18px;position:relative;overflow:hidden}
+.pred::before{content:'⚡ PREDICTIVE INSIGHT';font-family:var(--fm);font-size:8.5px;color:var(--lime);letter-spacing:1.2px;display:block;margin-bottom:9px}
+.pred-t{font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);letter-spacing:-.3px;margin-bottom:5px}
+.pred-d{font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.pred-acts{display:flex;gap:8px;flex-wrap:wrap}
+.pred-a{padding:6px 13px;border-radius:5px;font-family:var(--fm);font-size:9.5px;cursor:pointer;border:1px solid;transition:all .12s}
+.pred-a.p{background:var(--lime);color:var(--void);border-color:var(--lime);font-weight:700}
+.pred-a.p:hover{background:#d4ff1a}
+.pred-a.s{background:transparent;color:var(--t2);border-color:var(--bn)}
+.pred-a.s:hover{color:var(--t1);border-color:var(--bn2)}
+
+/* ─── WIDGET GRID ─── */
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px}
+.widget{background:var(--s1);border:1px solid var(--bn);border-radius:10px;padding:15px;position:relative;transition:border-color .15s}
+.widget:hover{border-color:var(--bn2)}
+.wdrag{position:absolute;top:9px;right:9px;cursor:grab;color:var(--t3);font-size:11px;opacity:.5}
+.wdrag:hover{opacity:1;color:var(--t2)}
+.widget.dragging{opacity:.4;border-color:var(--b2)}
+.wlbl{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.wval{font-family:var(--fh);font-size:30px;font-weight:700;letter-spacing:-1.2px;line-height:1;margin-bottom:3px}
+.wtrend{font-size:11px;color:var(--t2)}
+
+/* ─── COMPLIANCE RINGS ─── */
+.cr-g{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.cr{background:var(--s1);border:1px solid var(--bn);border-radius:9px;padding:14px 8px;text-align:center;transition:all .15s}
+.cr:hover{border-color:var(--bn2)}
+.rw{position:relative;width:70px;height:70px;margin:0 auto 8px}
+.rw svg{width:100%;height:100%;transform:rotate(-90deg)}
+.rbg{fill:none;stroke:var(--s3);stroke-width:6}
+.rfill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)}
+.rl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.rl-pct{font-family:var(--fh);font-size:15px;font-weight:700;line-height:1;letter-spacing:-.5px}
+.rl-s{font-size:8px;color:var(--t3);font-family:var(--fm)}
+.cr-name{font-family:var(--fm);font-size:9.5px;font-weight:400;color:var(--t1);margin-bottom:1px}
+.cr-status{font-size:10px;color:var(--t3)}
+
+/* ─── AGENT BUILDER ─── */
+.ab-steps{display:flex;gap:0;margin-bottom:24px;position:relative;padding:0 2px}
+.ab-steps::before{content:'';position:absolute;top:13px;left:14%;right:14%;height:1px;background:var(--bn2);z-index:0}
+.ab-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.ab-sn{width:26px;height:26px;border-radius:50%;background:var(--s2);border:1px solid var(--bn);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;color:var(--t3);margin-bottom:5px;transition:all .2s}
+.ab-step.done .ab-sn{background:var(--lime-d);border-color:var(--b2);color:var(--lime)}
+.ab-step.act .ab-sn{background:var(--lime);border-color:var(--lime);color:var(--void);font-weight:700}
+.ab-sl{font-family:var(--fm);font-size:8.5px;color:var(--t3);text-align:center;line-height:1.3}
+.ab-step.act .ab-sl{color:var(--lime)}
+.ab-step.done .ab-sl{color:var(--t2)}
+.ab-body{min-height:380px}
+
+/* Templates */
+.tpl-g{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:18px}
+.tpl-c{background:var(--s1);border:1px solid var(--bn);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.tpl-c:hover{border-color:var(--bn2);transform:translateY(-1px)}
+.tpl-c.sel{background:var(--lime-d);border-color:var(--b2)}
+.tpl-c::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--lime);opacity:0;transition:opacity .15s}
+.tpl-c.sel::after{opacity:1}
+.tpl-ico{font-size:20px;margin-bottom:9px}
+.tpl-name{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px;letter-spacing:-.2px}
+.tpl-desc{font-size:11.5px;color:var(--t2);line-height:1.5}
+.tpl-tag{font-family:var(--fm);font-size:8px;color:var(--lime);background:var(--lime-d);border:1px solid var(--b1);border-radius:3px;padding:2px 5px;margin-top:9px;display:inline-block;letter-spacing:.4px}
+.tpl-check{display:none;position:absolute;top:9px;right:9px;width:16px;height:16px;border-radius:50%;background:var(--lime);color:var(--void);font-size:9px;align-items:center;justify-content:center;font-weight:700}
+.tpl-c.sel .tpl-check{display:flex}
+
+/* Fields */
+.fld{margin-bottom:16px}
+.fld label{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px}
+.fld input,.fld textarea,.fld select{width:100%;background:var(--s2);border:1px solid var(--bn);border-radius:7px;padding:9px 12px;font-size:13px;font-family:var(--fb);color:var(--t1);outline:none;transition:border-color .15s}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--b1)}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--t3)}
+.fld textarea{resize:vertical;line-height:1.6}
+.fld select{cursor:pointer}
+.fld-hint{font-size:10.5px;color:var(--t3);margin-top:4px}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+/* Protocol toggles */
+.proto-g{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.proto{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--s2);border:1px solid var(--bn);border-radius:7px;cursor:pointer;transition:all .12s}
+.proto:hover{border-color:var(--bn2)}
+.proto.on{background:var(--lime-d);border-color:var(--b1)}
+.proto-chk{width:14px;height:14px;border-radius:3px;border:1px solid var(--bn2);background:var(--s3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:700;transition:all .12s}
+.proto.on .proto-chk{background:var(--lime);border-color:var(--lime);color:var(--void)}
+.proto-lbl{font-size:11.5px;color:var(--t2);line-height:1.3}
+.proto.on .proto-lbl{color:var(--t1)}
+
+/* Toggle */
+.tgl{position:relative;display:inline-block;width:32px;height:18px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-s{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--s3);border-radius:99px;transition:.2s;border:1px solid var(--bn2)}
+.tgl-s::before{position:absolute;content:'';height:12px;width:12px;left:2px;bottom:2px;background:var(--t3);border-radius:50%;transition:.2s}
+.tgl input:checked+.tgl-s{background:var(--lime-d);border-color:var(--b2)}
+.tgl input:checked+.tgl-s::before{transform:translateX(14px);background:var(--lime)}
+
+/* Trigger pills */
+.trig-p{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.trig{padding:6px 14px;border-radius:6px;border:1px solid var(--bn);background:transparent;color:var(--t2);font-size:11.5px;font-family:var(--fm);cursor:pointer;transition:all .12s}
+.trig:hover{border-color:var(--bn2);color:var(--t1)}
+.trig.on{background:var(--lime-d);color:var(--lime);border-color:var(--b1)}
+
+/* Autonomy */
+.auto-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.auto{padding:11px 9px;background:var(--s2);border:1px solid var(--bn);border-radius:7px;cursor:pointer;text-align:center;transition:all .12s}
+.auto:hover{border-color:var(--bn2)}
+.auto.on{background:var(--lime-d);border-color:var(--b2)}
+.auto-lv{font-family:var(--fm);font-size:8.5px;color:var(--lime);margin-bottom:3px}
+.auto-name{font-size:12px;color:var(--t1);margin-bottom:2px;font-weight:500}
+.auto-desc{font-size:10px;color:var(--t3);line-height:1.3}
+
+/* Review */
+.rev-sec{background:var(--s2);border:1px solid var(--bn);border-radius:7px;padding:14px;margin-bottom:11px}
+.rev-sec-t{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:9px}
+.rev-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--bn)}
+.rev-row:last-child{border-bottom:none}
+.rev-k{color:var(--t2)}
+.rev-v{color:var(--t1);font-family:var(--fm);font-size:11px}
+
+/* AB nav */
+.ab-nav{display:flex;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--bn)}
+.btn-ab{padding:8px 18px;border-radius:7px;font-size:12px;font-family:var(--fm);cursor:pointer;border:1px solid;transition:all .15s}
+.btn-ab-s{background:transparent;color:var(--t2);border-color:var(--bn)}
+.btn-ab-s:hover{border-color:var(--bn2);color:var(--t1)}
+.btn-ab-p{background:var(--lime);color:var(--void);border-color:var(--lime);font-weight:700}
+.btn-ab-p:hover{background:#d4ff1a}
+
+/* Perm */
+.perm-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bn)}
+.perm-row:last-child{border-bottom:none}
+.perm-name{font-size:12.5px;color:var(--t1)}
+.perm-desc{font-size:11px;color:var(--t2);margin-top:1px}
+
+/* Run screen */
+.run-s{display:none;min-height:360px;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+.run-s.act{display:flex}
+.run-pct{font-family:var(--fh);font-size:80px;font-weight:700;color:var(--lime);line-height:1;letter-spacing:-4px}
+.run-stage{font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+.run-bar{width:100%;max-width:460px;height:1.5px;background:var(--s3);border-radius:99px}
+.run-fill{height:1.5px;border-radius:99px;background:var(--lime);transition:width .5s}
+.run-log{width:100%;max-width:520px;height:180px;overflow-y:auto;background:var(--s2);border:1px solid var(--bn);border-radius:7px;padding:12px}
+.lline{font-family:var(--fm);font-size:10px;color:var(--t2);margin-bottom:4px;line-height:1.5}
+.lts{color:var(--t3)}.lok{color:var(--lime)}.lw{color:var(--amb)}.lem{color:var(--t1)}
+.cursor-b{display:inline-block;width:5px;height:10px;background:var(--lime);vertical-align:middle;animation:bk 1s infinite}
+
+/* Agent library */
+.alc{background:var(--s1);border:1px solid var(--bn);border-radius:10px;padding:16px;transition:all .15s;cursor:pointer;position:relative}
+.alc:hover{border-color:var(--bn2);transform:translateY(-1px)}
+.alc-type{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.alc-ico{font-size:18px}
+.alc-name{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px;letter-spacing:-.2px}
+.alc-desc{font-size:11.5px;color:var(--t2);line-height:1.5;margin-bottom:11px}
+.alc-meta{display:flex;gap:8px;align-items:center;font-family:var(--fm);font-size:9.5px;color:var(--t3)}
+.alc-run{margin-left:auto;padding:4px 11px;background:var(--lime);border-radius:5px;color:var(--void);font-family:var(--fm);font-size:9.5px;font-weight:700;border:none;cursor:pointer;transition:background .12s}
+.alc-run:hover{background:#d4ff1a}
+
+/* Conversational */
+.conv-wrap{display:flex;flex-direction:column;height:calc(100vh - 140px)}
+.conv-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.conv-msg{display:flex;gap:9px;max-width:86%}
+.conv-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.conv-av{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.conv-av.bot{background:var(--lime-d);border:1px solid var(--b1);color:var(--lime);font-family:var(--fh);font-weight:700}
+.conv-av.user{background:linear-gradient(135deg,#0a84ff,#bf5af2);color:#fff;font-family:var(--fh);font-weight:700}
+.conv-bub{padding:10px 13px;border-radius:9px;font-size:12.5px;line-height:1.6}
+.conv-msg.bot .conv-bub{background:var(--s2);color:var(--t1);border:1px solid var(--bn);border-bottom-left-radius:2px}
+.conv-msg.user .conv-bub{background:var(--lime-d);color:var(--t1);border:1px solid var(--b1);border-bottom-right-radius:2px}
+.conv-bub strong{color:var(--lime);font-weight:500}
+.conv-bub code{font-family:var(--fm);font-size:10.5px;background:var(--s3);padding:1px 4px;border-radius:3px;color:var(--blu)}
+.conv-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px}
+.conv-chip{padding:5px 11px;background:var(--s2);border:1px solid var(--bn);border-radius:6px;font-size:11.5px;color:var(--t2);cursor:pointer;transition:all .12s}
+.conv-chip:hover{border-color:var(--b1);color:var(--lime)}
+.conv-inp{display:flex;gap:7px;padding:12px 14px;border-top:1px solid var(--bn)}
+.conv-inp input{flex:1;background:var(--s2);border:1px solid var(--bn);border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:var(--fb);color:var(--t1);outline:none;transition:border-color .15s}
+.conv-inp input:focus{border-color:var(--b1)}
+.conv-inp input::placeholder{color:var(--t3)}
+.conv-send{width:34px;height:34px;border-radius:7px;background:var(--lime);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--void);font-size:13px;flex-shrink:0;transition:background .15s}
+.conv-send:hover{background:#d4ff1a}
+.conv-typing{display:flex;gap:4px;padding:6px 9px;background:var(--s2);border-radius:7px;width:fit-content}
+.conv-typing span{width:4px;height:4px;border-radius:50%;background:var(--t3)}
+.conv-typing span:nth-child(1){animation:dot 1.2s 0s infinite}
+.conv-typing span:nth-child(2){animation:dot 1.2s .2s infinite}
+.conv-typing span:nth-child(3){animation:dot 1.2s .4s infinite}
+@keyframes dot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* Integration hub */
+.int-cat{margin-bottom:18px}
+.int-cat-t{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bn)}
+.int-item{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--s1);border:1px solid var(--bn);border-radius:7px;transition:all .12s;cursor:pointer;margin-bottom:5px}
+.int-item:hover{border-color:var(--bn2);background:var(--s2)}
+.int-item.conn{border-color:var(--b1)}
+.int-logo{width:28px;height:28px;border-radius:6px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:1px solid var(--bn)}
+.int-item.conn .int-logo{background:var(--lime-d);border-color:var(--b1)}
+.int-name{font-size:12px;font-weight:500;color:var(--t1)}
+.int-status{font-size:10px;color:var(--t3)}
+.int-item.conn .int-status{color:var(--lime)}
+.int-btn{margin-left:auto;font-family:var(--fm);font-size:8.5px;padding:3px 7px;border-radius:4px;border:1px solid var(--bn);color:var(--t3);background:transparent;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0}
+.int-btn:hover{border-color:var(--b1);color:var(--lime)}
+.int-item.conn .int-btn{color:var(--lime);border-color:var(--b1)}
+
+/* Governance Graph */
+.gg-wrap{position:relative;width:100%;height:400px;background:var(--s2);border-radius:8px;overflow:hidden;border:1px solid var(--bn)}
+
+/* Evidence / regulatory */
+.ev-item{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--s1);border:1px solid var(--bn);border-radius:8px;margin-bottom:7px;transition:border-color .15s;cursor:pointer}
+.ev-item:hover{border-color:var(--bn2)}
+.ev-ico{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ev-name{font-size:12.5px;font-weight:500;color:var(--t1)}
+.ev-meta{font-size:11px;color:var(--t2);margin-top:2px}
+.ev-r{margin-left:auto;text-align:right;flex-shrink:0}
+.ev-reuse{font-family:var(--fm);font-size:10px;color:var(--lime)}
+.ev-date{font-size:9.5px;color:var(--t3)}
+
+/* Reg tracker */
+.reg-item{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--s1);border:1px solid var(--bn);border-radius:8px;margin-bottom:7px;cursor:pointer;transition:border-color .15s}
+.reg-item:hover{border-color:var(--bn2)}
+.reg-flag{font-size:18px;width:30px;text-align:center;flex-shrink:0}
+.reg-n{font-size:12.5px;font-weight:500;color:var(--t1)}
+.reg-d{font-size:11px;color:var(--t2);margin-top:1px}
+.reg-r{margin-left:auto;text-align:right;flex-shrink:0}
+.reg-date{font-family:var(--fm);font-size:10.5px;color:var(--t1)}
+.reg-s{font-size:9.5px;color:var(--t3)}
+
+/* ROI */
+.roi-big{font-family:var(--fh);font-size:52px;font-weight:700;color:var(--lime);letter-spacing:-2.5px;line-height:1;margin-bottom:3px}
+.roi-line{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bn)}
+.roi-line:last-child{border-bottom:none}
+.roi-lv{font-family:var(--fm);font-size:12.5px;font-weight:400}
+.roi-lv.pos{color:#30d158}.roi-lv.neg{color:var(--red)}
+
+/* Maturity */
+.mat-row{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:20px}
+.ms{padding:13px 8px;background:var(--s1);border:1px solid var(--bn);border-radius:9px;text-align:center;position:relative}
+.ms.done{border-color:var(--bn2);opacity:.6}
+.ms.cur{background:var(--lime-d);border-color:var(--b2)}
+.ms-num{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t3);line-height:1;margin-bottom:3px}
+.ms.done .ms-num{color:var(--t2)}.ms.cur .ms-num{color:var(--lime)}
+.ms-lbl{font-size:9.5px;color:var(--t3);font-family:var(--fm);line-height:1.3}
+.ms.cur .ms-lbl{color:var(--lime)}
+.ms-marker{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:var(--lime);color:var(--void);font-size:7px;font-family:var(--fm);font-weight:700;letter-spacing:.5px;padding:2px 5px;border-radius:3px;white-space:nowrap}
+
+/* Sliders */
+input[type=range]{-webkit-appearance:none;width:100%;height:2.5px;background:var(--s3);border-radius:99px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--lime);border:2px solid var(--s1);cursor:pointer}
+.slg{margin-bottom:18px}
+.slh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sl-n{font-size:12.5px;color:var(--t2)}
+.sl-v{font-family:var(--fm);font-size:12px;font-weight:400;color:var(--lime)}
+
+/* Bias audit bars */
+.ba-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bn)}
+.ba-row:last-child{border-bottom:none}
+.ba-attr{font-size:12px;color:var(--t1);min-width:160px}
+.ba-bwrap{flex:1}
+.ba-bg{height:7px;background:var(--s3);border-radius:99px;overflow:hidden;position:relative}
+.ba-ref{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.2)}
+.ba-fill{height:100%;border-radius:99px}
+.ba-score{font-family:var(--fm);font-size:11px;min-width:36px;text-align:right}
+.ba-delta{font-family:var(--fm);font-size:10px;min-width:48px;text-align:right}
+
+/* Incident */
+.inc{display:flex;gap:12px;padding:13px;background:var(--s1);border:1px solid var(--bn);border-radius:9px;margin-bottom:8px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s}
+.inc:hover{border-color:var(--bn2)}
+.inc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px}
+.inc.crit::before{background:var(--red)}.inc.hi::before{background:var(--amb)}.inc.med::before{background:var(--blu)}
+.inc-ico{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.inc-t{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:2px}
+.inc-s{font-size:11.5px;color:var(--t2)}
+.inc-m{margin-left:auto;text-align:right;flex-shrink:0}
+.inc-sla{font-family:var(--fm);font-size:10px}
+.inc-sla.ok{color:#30d158}.inc-sla.warn{color:var(--amb)}.inc-sla.breach{color:var(--red)}
+.inc-ts{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* Audit trail */
+.tt-row{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--bn)}
+.tt-row:last-child{border-bottom:none}
+.tt-ts{font-family:var(--fm);font-size:9.5px;color:var(--t3);min-width:66px;flex-shrink:0;margin-top:1px}
+.tt-ico{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.tt-t{font-size:12.5px;color:var(--t1);margin-bottom:1px}
+.tt-s{font-size:11px;color:var(--t2)}
+.tt-why{margin-left:auto;flex-shrink:0}
+
+/* Lineage */
+.lin-node{display:inline-flex;flex-direction:column;align-items:center;gap:4px;padding:10px 14px;border-radius:9px;border:1.5px solid;font-size:10.5px;font-family:var(--fm);text-align:center;min-width:80px}
+.lin-arrow{font-size:18px;color:var(--t3);flex-shrink:0;align-self:center}
+
+/* CMD */
+.cmd-ov{position:fixed;inset:0;background:rgba(6,8,15,.78);z-index:999;display:none;align-items:flex-start;justify-content:center;padding-top:88px;backdrop-filter:blur(8px)}
+.cmd-ov.open{display:flex}
+.cmd-box{width:520px;background:var(--s1);border:1px solid var(--b2);border-radius:11px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.cmd-inp{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1px solid var(--bn)}
+.cmd-inp input{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--t1);font-family:var(--fb)}
+.cmd-inp input::placeholder{color:var(--t3)}
+.cmd-r{padding:7px}
+.cmd-sl{font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;padding:5px 9px 3px;margin-top:3px}
+.cmd-it{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:6px;cursor:pointer;transition:background .1s;font-size:12.5px;color:var(--t1)}
+.cmd-it:hover,.cmd-it.sel{background:var(--lime-d);color:var(--lime)}
+.cmd-it-i{font-size:12px;width:16px;text-align:center;flex-shrink:0}
+.cmd-it-s{font-family:var(--fm);font-size:9px;color:var(--t3);margin-left:auto}
+
+/* FAB */
+.fab{position:fixed;bottom:20px;right:20px;z-index:500}
+.fab-btn{width:46px;height:46px;border-radius:50%;background:var(--lime);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:18px;font-weight:700;color:var(--void);box-shadow:0 0 18px var(--lime-g),0 4px 14px rgba(0,0,0,.4);transition:transform .2s}
+.fab-btn:hover{transform:scale(1.08)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bn2);border-radius:99px}
+
+/* ── ONBOARDING MODAL ── */
+.ob-ov{position:fixed;inset:0;background:rgba(6,8,15,.92);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
+.ob-ov.hide{display:none}
+.ob-box{width:560px;max-height:88vh;overflow-y:auto;background:var(--bg);border:1px solid var(--b2);border-radius:14px;padding:36px;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.ob-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.ob-logo-m{width:32px;height:32px;background:var(--lime);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:14px;font-weight:700;color:var(--void);flex-shrink:0}
+.ob-logo-n{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+.ob-step-bar{display:flex;gap:4px;margin-bottom:28px}
+.ob-step-seg{flex:1;height:3px;border-radius:99px;background:var(--s3);transition:background .3s}
+.ob-step-seg.done{background:var(--lime)}
+.ob-step-seg.act{background:var(--lime);opacity:.55}
+.ob-label{font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px}
+.ob-title{font-family:var(--fh);font-size:22px;font-weight:600;color:var(--t1);margin-bottom:6px;letter-spacing:-.5px;line-height:1.2}
+.ob-sub{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.65}
+.ob-opts{display:grid;gap:8px;margin-bottom:20px}
+.ob-opts.two{grid-template-columns:1fr 1fr}
+.ob-opts.three{grid-template-columns:1fr 1fr 1fr}
+.ob-opt{padding:12px 14px;background:var(--s2);border:1px solid var(--bn);border-radius:8px;cursor:pointer;transition:all .12s;text-align:left}
+.ob-opt:hover{border-color:var(--bn2)}
+.ob-opt.on{background:var(--lime-d);border-color:var(--b2)}
+.ob-opt .ob-opt-name{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:2px}
+.ob-opt.on .ob-opt-name{color:var(--lime)}
+.ob-opt .ob-opt-sub{font-size:10.5px;color:var(--t3);line-height:1.4}
+.ob-opt-check{display:none;float:right;width:14px;height:14px;border-radius:50%;background:var(--lime);color:var(--void);font-size:8px;align-items:center;justify-content:center;font-weight:700;margin-top:2px}
+.ob-opt.on .ob-opt-check{display:flex}
+.ob-nav{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ob-btn-p{padding:10px 22px;background:var(--lime);border:none;border-radius:7px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--void);cursor:pointer;transition:background .12s;letter-spacing:.3px}
+.ob-btn-p:hover{background:#d4ff1a}
+.ob-btn-s{padding:10px 18px;background:transparent;border:1px solid var(--bn);border-radius:7px;font-family:var(--fm);font-size:11px;color:var(--t2);cursor:pointer;transition:all .12s}
+.ob-btn-s:hover{border-color:var(--bn2);color:var(--t1)}
+.ob-skip{font-family:var(--fm);font-size:10px;color:var(--t3);cursor:pointer;text-decoration:underline}
+.ob-skip:hover{color:var(--t2)}
+.ob-configuring{text-align:center;padding:20px 0}
+.ob-cfg-spinner{width:44px;height:44px;border:3px solid var(--s3);border-top-color:var(--lime);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ob-cfg-title{font-family:var(--fh);font-size:18px;font-weight:600;color:var(--t1);margin-bottom:8px}
+.ob-cfg-steps{font-family:var(--fm);font-size:10px;color:var(--t3);line-height:1.8}
+
+
+@keyframes feedIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<nav class="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">M</div>
+    <div class="sb-brand">
+      <div class="sb-name">Meridian</div>
+      <div class="sb-tag">AI GOVERNANCE PLATFORM</div>
+    </div>
+  </div>
+  <div class="sb-q">
+    <span class="sb-qi">⌕</span>
+    <input type="text" placeholder="Search anything..." onclick="openCmd()">
+    <span class="sb-qk">⌘K</span>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">Command</div>
+    <div class="ni act" onclick="nav('dashboard')"><span class="ni-i">▣</span> Overview <span class="ni-live"></span></div>
+    <div class="ni" onclick="nav('registry')"><span class="ni-i">◫</span> AI Registry <span class="ni-b">247</span></div>
+    <div class="ni" onclick="nav('agents')"><span class="ni-i">◉</span> Agent Monitor <span class="ni-b">6</span></div>
+    <div class="ni" onclick="nav('risk')"><span class="ni-i">◈</span> Risk Intelligence <span class="ni-b">18</span></div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">Build & Operate</div>
+    <div class="ni" onclick="nav('builder')"><span class="ni-i">✦</span> Agent Builder</div>
+    <div class="ni" onclick="nav('library')"><span class="ni-i">⊞</span> Agent Library <span class="ni-b ok">7</span></div>
+    <div class="ni" onclick="nav('policy')"><span class="ni-i">◧</span> Policy Engine</div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">Intelligence</div>
+    <div class="ni" onclick="nav('advisor')"><span class="ni-i">◐</span> AI Advisor</div>
+    <div class="ni" onclick="nav('graph')"><span class="ni-i">⬡</span> Governance Graph</div>
+    <div class="ni" onclick="nav('bias')"><span class="ni-i">⊕</span> Bias Audits</div>
+    <div class="ni" onclick="nav('nist')"><span class="ni-i">✦</span> NIST Assessment</div>
+    <div class="ni" onclick="nav('lineage')"><span class="ni-i">⇢</span> Data Lineage</div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">Compliance</div>
+    <div class="ni" onclick="nav('incidents')"><span class="ni-i">⚡</span> Incidents <span class="ni-b">3</span></div>
+    <div class="ni" onclick="nav('evidence')"><span class="ni-i">◱</span> Evidence Library</div>
+    <div class="ni" onclick="nav('vendors')"><span class="ni-i">☁</span> Vendor Portal</div>
+    <div class="ni" onclick="nav('regs')"><span class="ni-i">⚖</span> Regulatory Tracker</div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">Extended</div>
+    <div class="ni" onclick="nav('integrations')"><span class="ni-i">⬡</span> Integration Hub <span class="ni-b ok">24</span></div>
+    <div class="ni" onclick="nav('audit')"><span class="ni-i">⊟</span> Audit Trail</div>
+    <div class="ni" onclick="nav('roi')"><span class="ni-i">▤</span> ROI Calculator</div>
+    <div class="ni" onclick="nav('maturity')"><span class="ni-i">▥</span> Maturity Score</div>
+  </div>
+
+  <div class="sb-div"></div>
+  <div class="sb-ft">
+    <div class="sb-user">
+      <div class="sb-av">MC</div>
+      <div><div class="sb-uname">Mastercard</div><div class="sb-urole">Chief AI Officer</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+
+<!-- TOPBAR -->
+<div class="tb">
+  <div class="tb-bc" id="tb-bc"><span id="tb-title">Overview</span></div>
+  <div class="tb-sp"></div>
+  <div class="tb-live"><div class="tb-ldot"></div>MONITORING LIVE</div><div style="font-family:var(--fm);font-size:10px;color:var(--t3);padding:4px 8px;border:1px solid var(--bn);border-radius:4px;margin-left:2px" id="live-clock">--:--:-- UTC</div>
+  <div class="tb-ico" onclick="openCmd()" title="⌘K">⌕</div>
+  <div class="tb-ico">🔔<div class="tb-notif"></div></div>
+  <button class="tb-btn" onclick="nav('integrations')">⬡ Integrations</button>
+  <button class="tb-btn p" onclick="nav('builder')">✦ Build Agent</button>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page act" id="page-dashboard">
+  <div class="pred">
+    <div class="pred-t">Credit Decisioning v3 — bias drift will breach SLA in <span id="pred-sla" style="color:var(--red);font-weight:600">5h 59m 57s</span></div>
+    <div class="pred-d">Demographic parity gap trending +0.8pp/h over 4h. EU AI Act Art.9 threshold breach projected before next scheduled review. 3 similar Q3 incidents resolved in &lt;2h when caught early.</div>
+    <div class="pred-acts">
+      <button class="pred-a p" onclick="nav('builder')">✦ Deploy Bias Auditor</button>
+      <button class="pred-a s" onclick="nav('risk')">→ Risk details</button>
+      <button class="pred-a s" onclick="nav('advisor')">Ask Advisor</button>
+    </div>
+  </div>
+
+  <div class="kg">
+    <div class="kc lime"><div class="kc-lbl">Systems Governed</div><div class="kc-val" data-cnt="247">0</div><div class="kc-d"><span class="up">↑ 34</span> this month</div></div>
+    <div class="kc red"><div class="kc-lbl">Risk Exposure</div><div class="kc-val" style="font-size:26px;letter-spacing:-.8px">$4.2M</div><div class="kc-d"><span class="dn">↑ $0.7M</span> vs Q3</div></div>
+    <div class="kc amb"><div class="kc-lbl">Open Flags</div><div class="kc-val" data-cnt="18" id="flags-kpi" data-kpi="flags">0</div><div class="kc-d"><span class="dn">↑ 3</span> this week</div></div>
+    <div class="kc lime"><div class="kc-lbl">Gov. Health Score</div><div class="kc-val">82</div><div class="kc-d"><span class="up">↑ 7pts</span> · B+ this quarter</div></div>
+  </div>
+
+  <!-- Modular widgets -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <span style="font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Live Widgets — drag to rearrange</span>
+    <span style="font-family:var(--fm);font-size:9px;color:var(--lime);cursor:pointer">⊞ Add widget</span>
+  </div>
+  <div class="wg" id="wGrid">
+    <div class="widget" draggable="true" ondragstart="dStart(event)" ondrop="dDrop(event)" ondragover="dOver(event)">
+      <span class="wdrag">⠿</span>
+      <div class="wlbl">EU AI Act Coverage</div>
+      <div class="wval" style="color:var(--lime)">88%</div>
+      <div class="wtrend"><span class="up">↑ 4%</span> last month · 14 controls pending</div>
+      <div style="margin-top:9px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:3px"><span>Progress</span><span style="font-family:var(--fm);color:var(--lime)">88/100</span></div><div style="height:3px;background:var(--s3);border-radius:99px"><div style="width:88%;height:3px;background:var(--lime);border-radius:99px"></div></div></div>
+    </div>
+    <div class="widget" draggable="true" ondragstart="dStart(event)" ondrop="dDrop(event)" ondragover="dOver(event)">
+      <span class="wdrag">⠿</span>
+      <div class="wlbl">Active Agents</div>
+      <div class="wval" style="color:var(--blu)">38</div>
+      <div class="wtrend">6 shadow · <span class="dn">3 violations today</span></div>
+      <div style="display:flex;gap:5px;margin-top:9px"><span class="bd lo">32 active</span><span class="bd hi">6 shadow</span></div>
+    </div>
+    <div class="widget" draggable="true" ondragstart="dStart(event)" ondrop="dDrop(event)" ondragover="dOver(event)">
+      <span class="wdrag">⠿</span>
+      <div class="wlbl">Avg Review Time</div>
+      <div class="wval" style="color:var(--lime)">2.4h</div>
+      <div class="wtrend">vs 24h manual · <span class="up">10× faster</span></div>
+      <div class="why-btn" style="margin-top:9px" onclick="tWhy(this)">ⓘ WHY THIS NUMBER</div>
+      <div class="why-panel"><div class="why-title">Reasoning Factors</div><div class="why-row"><span class="why-factor">Automated intake workflow</span><div class="why-bar"><div class="why-fill" style="width:70%"></div></div><span class="why-pct">70%</span></div><div class="why-row"><span class="why-factor">Pre-built policy mappings</span><div class="why-bar"><div class="why-fill" style="width:20%"></div></div><span class="why-pct">20%</span></div><div class="why-conf">Confidence: 89% · 247 reviews in last 90d</div></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="pn"><div class="pnh"><div><div class="pnt">Risk & Compliance Trend</div><div class="pns">12 months + 3-month AI forecast</div></div><span class="va">→ Full report</span></div><div class="cw" style="height:220px"><canvas id="trendChart" role="img" aria-label="Trend">Trend data</canvas></div></div>
+    <div class="pn">
+      <div class="pnh"><div class="pnt">Risk Distribution</div></div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t2)"><span style="width:7px;height:7px;border-radius:2px;background:var(--red);display:inline-block"></span>Critical 7%</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t2)"><span style="width:7px;height:7px;border-radius:2px;background:var(--amb);display:inline-block"></span>High 23%</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t2)"><span style="width:7px;height:7px;border-radius:2px;background:var(--blu);display:inline-block"></span>Medium 38%</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t2)"><span style="width:7px;height:7px;border-radius:2px;background:var(--lime);display:inline-block"></span>Low 32%</span>
+      </div>
+      <div class="cw" style="height:184px"><canvas id="donut" role="img" aria-label="Distribution">Donut</canvas></div>
+    </div>
+  </div>
+
+  <div class="g2e">
+    <div class="pn">
+      <div class="pnh"><div class="pnt">Top Risk Flags — $ Exposure</div><span class="va" onclick="nav('risk')">→ All</span></div>
+      <div class="tw"><table><thead><tr><th>System</th><th>Type</th><th>Sev.</th><th>Exposure</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="tdn">Credit Decisioning v3</td><td class="tdm">Bias Drift</td><td><span class="bd crit">Critical</span></td><td class="td$$">$1.9M</td><td><div class="why-btn" onclick="tWhy(this)">ⓘ</div><div class="why-panel"><div class="why-title">Why Critical?</div><div class="why-row"><span class="why-factor">Demographic parity gap</span><div class="why-bar"><div class="why-fill" style="width:80%"></div></div><span class="why-pct">80%</span></div><div class="why-conf">Confidence: 94% · AgentDNA™ detected</div></div></td></tr>
+        <tr><td class="tdn">Customer Churn Model</td><td class="tdm">Data Leak</td><td><span class="bd hi">High</span></td><td class="td$$">$840K</td><td><span style="color:var(--t3);font-size:9.5px">—</span></td></tr>
+        <tr><td class="tdn">HR Resume Screener</td><td class="tdm">Fairness</td><td><span class="bd hi">High</span></td><td class="td$$">$620K</td><td><span style="color:var(--t3);font-size:9.5px">—</span></td></tr>
+        <tr><td class="tdn">Fraud Detection v7</td><td class="tdm">Explainability</td><td><span class="bd med">Medium</span></td><td class="td$$">$410K</td><td><span style="color:var(--t3);font-size:9.5px">—</span></td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="pn">
+      <div class="pnh"><div class="pnt">Live Activity</div><span class="va" onclick="nav('audit')">→ Audit log</span></div>
+      <div id="live-feed"><div class="tt-row"><span class="tt-ts" data-age="2">2m ago</span><div class="tt-ico" style="background:var(--red-d);color:var(--red)">⚠</div><div><div class="tt-t">Critical bias drift — Credit v3</div><div class="tt-s">EU AI Act Art.9 · SLA <span id="dash-sla-badge">5h 59m 57s</span> remaining</div></div><div class="tt-why"><div class="why-btn" onclick="tWhy(this)">ⓘ WHY</div><div class="why-panel"><div class="why-title">Detection</div><div class="why-row"><span class="why-factor">AgentDNA™ JS divergence</span><div class="why-bar"><div class="why-fill" style="width:85%"></div></div><span class="why-pct">0.85</span></div><div class="why-conf">Auto-detected · Continuous monitoring</div></div></div></div>
+      <div class="tt-row"><span class="tt-ts">18m ago</span><div class="tt-ico" style="background:var(--lime-d);color:var(--lime)">✓</div><div><div class="tt-t">Compliance review passed — GenAI Suite</div><div class="tt-s">ISO 42001 · Evidence auto-collected</div></div><div class="tt-why"></div></div>
+      <div class="tt-row"><span class="tt-ts">1h ago</span><div class="tt-ico" style="background:var(--blu-d);color:var(--blu)">+</div><div><div class="tt-t">Bias Auditor deployed — Healthcare vertical</div><div class="tt-s">Agent Builder · Weekly schedule</div></div><div class="tt-why"></div></div>
+      <div class="tt-row"><span class="tt-ts">3h ago</span><div class="tt-ico" style="background:var(--amb-d);color:var(--amb)">⬡</div><div><div class="tt-t">NIST RMF v1.1 policy propagated</div><div class="tt-s">34 systems updated · 0 violations introduced</div></div><div class="tt-why"></div></div></div><!-- /live-feed -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REGISTRY ═══ -->
+<div class="page" id="page-registry">
+  <div class="ph"><div><h1>AI <i>Registry</i></h1><p>Single source of truth for every AI agent, model, and application — including auto-detected shadow AI.</p></div><div class="ph-r"><button class="tb-btn">↓ Export</button><button class="tb-btn p">+ Register</button></div></div>
+  <div class="kg"><div class="kc lime"><div class="kc-lbl">Total Systems</div><div class="kc-val">247</div><div class="kc-d"><span class="up">↑ 34</span> this month</div></div><div class="kc amb"><div class="kc-lbl">Shadow AI</div><div class="kc-val" id="shadow-kpi">31</div><div class="kc-d">Auto-detected, ungoverned</div></div><div class="kc blu"><div class="kc-lbl">Third-Party</div><div class="kc-val">89</div><div class="kc-d">Across 24 vendors</div></div><div class="kc red"><div class="kc-lbl">Pending Review</div><div class="kc-val">12</div><div class="kc-d">Awaiting classification</div></div></div>
+  <div class="pn">
+    <div class="tw"><table>
+      <thead><tr><th>Name</th><th>Type</th><th>Owner</th><th>Risk</th><th>$ Exposure</th><th>Frameworks</th><th>Status</th><th>Model Card</th><th>Assessed</th></tr></thead>
+      <tbody>
+        <tr><td class="tdn">Credit Decisioning v3</td><td class="tdm">Model</td><td>Risk Analytics</td><td><span class="bd crit">Critical</span></td><td class="td$$">$1.9M</td><td class="tdm">EU AI Act · NIST</td><td><span class="bd rev">Review</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer">→ View</span></td><td class="tdm">Today</td></tr>
+        <tr><td class="tdn">Document AI Agent</td><td class="tdm">Agent</td><td>Operations</td><td><span class="bd hi">High</span></td><td class="td$$">$540K</td><td class="tdm">ISO 42001 · SOC 2</td><td><span class="bd live">Active</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer">→ View</span></td><td class="tdm">2d ago</td></tr>
+        <tr><td class="tdn">HR Resume Screener</td><td class="tdm">Application</td><td>Human Resources</td><td><span class="bd hi">High</span></td><td class="td$$">$620K</td><td class="tdm">NIST · GDPR</td><td><span class="bd rev">Review</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--amb);cursor:pointer">⚠ Draft</span></td><td class="tdm">1w ago</td></tr>
+        <tr><td class="tdn">Fraud Detection v7</td><td class="tdm">Model</td><td>Payments Security</td><td><span class="bd med">Medium</span></td><td class="td$$">$410K</td><td class="tdm">SOC 2 · PCI</td><td><span class="bd ok">Compliant</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer">→ View</span></td><td class="tdm">3d ago</td></tr>
+        <tr><td class="tdn">Marketing Copy GenAI</td><td class="tdm">Application</td><td>Marketing</td><td><span class="bd med">Medium</span></td><td class="td$$">$210K</td><td class="tdm">EU AI Act</td><td><span class="bd ok">Compliant</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer">→ View</span></td><td class="tdm">5d ago</td></tr>
+        <tr><td class="tdn">Customer Support Bot</td><td class="tdm">Agent</td><td>CX Operations</td><td><span class="bd lo">Low</span></td><td class="td$$">$85K</td><td class="tdm">GDPR · ISO 42001</td><td><span class="bd live">Active</span></td><td><span style="font-family:var(--fm);font-size:9.5px;color:var(--lime);cursor:pointer">→ View</span></td><td class="tdm">1d ago</td></tr>
+        <tr style="background:rgba(255,159,10,.03)"><td class="tdn" style="color:var(--amb)">⚠ Shadow AI (API Tool)</td><td class="tdm">Unknown</td><td>— Auto-detected</td><td><span class="bd hi">High</span></td><td class="tdm">—</td><td class="tdm">None</td><td><span class="bd off">Ungoverned</span></td><td style="color:var(--t3);font-size:9.5px">None</td><td class="tdm">Now</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ AGENT MONITOR ═══ -->
+<div class="page" id="page-agents">
+  <div class="ph"><div><h1>Agent <i>Monitor</i></h1><p>Real-time agentic governance — GAIA layer. Kill switches, autonomy enforcement, full action traces. AgentDNA™ behavioral fingerprinting.</p></div></div>
+  <div class="kg"><div class="kc lime"><div class="kc-lbl">Registered Agents</div><div class="kc-val">38</div><div class="kc-d"><span class="up">↑ 9</span> this month</div></div><div class="kc red"><div class="kc-lbl">Shadow Agents</div><div class="kc-val">6</div><div class="kc-d">Detected, ungoverned</div></div><div class="kc amb"><div class="kc-lbl">Violations Today</div><div class="kc-val">3</div><div class="kc-d">Auto-blocked</div></div><div class="kc blu"><div class="kc-lbl">Actions (24h)</div><div class="kc-val" style="font-size:24px;letter-spacing:-1px" id="agent-actions-kpi">12,847</div><div class="kc-d">Full audit trace</div></div></div>
+  <div class="pn" style="margin-bottom:14px">
+    <div class="pnh"><div><div class="pnt">Live Agent Network</div><div class="pns">Real-time topology · privilege boundaries · action flows</div></div></div>
+    <div class="gg-wrap"><canvas id="agentCanvas" style="width:100%;height:100%"></canvas></div>
+  </div>
+  <div class="pn">
+    <div class="pnh"><div class="pnt">Autonomy Levels & Kill Switches</div></div>
+    <div class="tw"><table><thead><tr><th>Agent</th><th>Autonomy</th><th>Permissions</th><th>Human Gate</th><th>Actions (24h)</th><th>AgentDNA™</th><th>Kill Switch</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="tdn">Document Processor</td><td><span class="bd lo">Observe</span></td><td class="tdm">read, summarize</td><td style="color:var(--lime)">Always</td><td class="tdm" data-agent-actions="4201">4,201</td><td class="tdm">Baseline stable</td><td><span class="bd ok">Armed</span></td><td><span class="bd live">Active</span></td></tr>
+      <tr><td class="tdn">Procurement Autopilot</td><td><span class="bd hi">Execute ≤$10K</span></td><td class="tdm">read, write, commit</td><td style="color:var(--amb)">Threshold</td><td class="tdm" data-agent-actions="892">892</td><td class="tdm"><span style="color:var(--amb)">JS=0.72 ⚠</span></td><td><span class="bd ok">Armed</span></td><td><span class="bd rev">Monitor</span></td></tr>
+      <tr><td class="tdn">Customer Outreach Bot</td><td><span class="bd lo">Draft only</span></td><td class="tdm">read, draft</td><td style="color:var(--lime)">Always</td><td class="tdm" data-agent-actions="6041">6,041</td><td class="tdm">Baseline stable</td><td><span class="bd ok">Armed</span></td><td><span class="bd live">Active</span></td></tr>
+      <tr style="background:rgba(255,45,85,.03)"><td class="tdn" style="color:var(--red)">⚠ Rogue Sales Agent</td><td><span class="bd crit">Unauthorized</span></td><td class="tdm">write, send, commit</td><td style="color:var(--red)">None (shadow)</td><td class="tdm">1,713</td><td class="tdm"><span style="color:var(--red)">JS=0.97 ⛔</span></td><td><span class="bd crit">⛔ Killed</span></td><td><span class="bd off">Blocked</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ RISK INTELLIGENCE ═══ -->
+<div class="page" id="page-risk">
+  <div class="ph"><div><h1>Risk <i>Intelligence</i></h1><p>Continuous risk assessment — monetary quantification, compliance rings, AI-powered reasoning with full transparency.</p></div></div>
+  <div class="cr-g" id="complianceRings">
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">EU AI Act</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-eu" cx="40" cy="40" r="32" stroke="#bfff00" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:var(--lime)">88%</div><div class="rl-s">covered</div></div></div><div class="cr-name">EU AI Act</div><div class="cr-status">14 pending</div></div>
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">NIST RMF</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-nist" cx="40" cy="40" r="32" stroke="#0a84ff" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:var(--blu)">94%</div><div class="rl-s">covered</div></div></div><div class="cr-name">NIST RMF</div><div class="cr-status">6 pending</div></div>
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">ISO 42001</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-iso" cx="40" cy="40" r="32" stroke="#ff9f0a" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:var(--amb)">79%</div><div class="rl-s">covered</div></div></div><div class="cr-name">ISO 42001</div><div class="cr-status">31 pending</div></div>
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">SOC 2</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-soc" cx="40" cy="40" r="32" stroke="#30d158" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:#30d158">97%</div><div class="rl-s">covered</div></div></div><div class="cr-name">SOC 2 Type II</div><div class="cr-status">2 pending</div></div>
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">GDPR</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-gdpr" cx="40" cy="40" r="32" stroke="#bf5af2" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:var(--pur)">85%</div><div class="rl-s">covered</div></div></div><div class="cr-name">GDPR</div><div class="cr-status">19 pending</div></div>
+    <div class="cr"><div class="cr-lbl" style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">HITRUST</div><div class="rw"><svg viewBox="0 0 80 80"><circle class="rbg" cx="40" cy="40" r="32"/><circle class="rfill" id="r-hit" cx="40" cy="40" r="32" stroke="#ff2d55" stroke-dasharray="201" stroke-dashoffset="201"/></svg><div class="rl"><div class="rl-pct" style="color:var(--red)">52%</div><div class="rl-s">covered</div></div></div><div class="cr-name">HITRUST</div><div class="cr-status">68 pending</div></div>
+  </div>
+  <div class="g2">
+    <div class="pn"><div class="pnh"><div><div class="pnt">Monetary Risk by Category</div><div class="pns">Expected annual loss in dollars</div></div></div><div class="cw" style="height:230px"><canvas id="riskBarChart" role="img" aria-label="Risk categories">Risk data</canvas></div></div>
+    <div class="pn"><div class="pnh"><div class="pnt">Top Monetary Risks</div><span class="va" onclick="nav('advisor')">→ AI analysis</span></div>
+      <div>
+        <div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Credit Model Bias Drift</span><span class="td$$" style="margin-right:7px">$1.9M</span><span style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">p=0.34</span><div class="why-btn" style="margin-left:7px" onclick="tWhy(this)">ⓘ</div><div class="why-panel"><div class="why-title">Exposure Breakdown</div><div class="why-row"><span class="why-factor">EU AI Act fine (6% rev.)</span><div class="why-bar"><div class="why-fill" style="width:45%"></div></div><span class="why-pct">45%</span></div><div class="why-row"><span class="why-factor">Litigation exposure</span><div class="why-bar"><div class="why-fill" style="width:30%"></div></div><span class="why-pct">30%</span></div><div class="why-conf">MC 95% CI: $1.1M–$3.1M</div></div></div>
+        <div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">EU Act Non-Compliance Fine</span><span class="td$$" style="margin-right:7px">$2.1M</span><span style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">p=0.09</span></div>
+        <div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Customer Data Leak via LLM</span><span class="td$$" style="margin-right:7px">$840K</span><span style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">p=0.22</span></div>
+        <div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">HR Screening Violation</span><span style="font-family:var(--fm);font-size:11.5px;color:var(--amb);font-weight:700;margin-right:7px">$620K</span><span style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">p=0.41</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pn"><div class="pnh"><div class="pnt">Risk Heatmap — Systems × Risk Categories</div></div><div id="heatmap" style="overflow-x:auto;margin-top:12px"></div></div>
+</div>
+
+<!-- ═══ AGENT BUILDER ═══ -->
+<div class="page" id="page-builder">
+  <div class="ph"><div><h1>Agent <i>Builder</i></h1><p>Design governance agents from protocol to deployment — in plain English or guided steps. The platform converts intent into working enforcement logic.</p></div><div class="ph-r"><span style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">Step <span id="ab-sd">1</span> of 6</span></div></div>
+  <div class="ab-steps" id="ab-steps">
+    <div class="ab-step act" data-s="1"><div class="ab-sn">1</div><div class="ab-sl">Template</div></div>
+    <div class="ab-step" data-s="2"><div class="ab-sn">2</div><div class="ab-sl">Goals &amp; Vertical</div></div>
+    <div class="ab-step" data-s="3"><div class="ab-sn">3</div><div class="ab-sl">Protocols</div></div>
+    <div class="ab-step" data-s="4"><div class="ab-sn">4</div><div class="ab-sl">Triggers &amp; Data</div></div>
+    <div class="ab-step" data-s="5"><div class="ab-sn">5</div><div class="ab-sl">Permissions</div></div>
+    <div class="ab-step" data-s="6"><div class="ab-sn">6</div><div class="ab-sl">Deploy</div></div>
+  </div>
+  <div class="ab-body" id="ab-s1">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:3px;letter-spacing:-.3px">Choose a starting point</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:16px">Select a template or describe in plain English below</div>
+    <div class="tpl-g">
+      <div class="tpl-c sel" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">⊕</div><div class="tpl-name">Bias Auditor</div><div class="tpl-desc">Systematically probe AI decisions for demographic disparities. Bertrand-Mullainathan methodology, fairness scoring, auto-remediation suggestions.</div><div class="tpl-tag">EQUIAUDIT-STYLE</div></div>
+      <div class="tpl-c" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">⚖</div><div class="tpl-name">Compliance Checker</div><div class="tpl-desc">Continuous evaluation against EU AI Act, NIST RMF, ISO 42001. Auto-collects evidence, flags gaps, generates audit-ready reports.</div><div class="tpl-tag">EU AI ACT READY</div></div>
+      <div class="tpl-c" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">📡</div><div class="tpl-name">Drift Monitor</div><div class="tpl-desc">AgentDNA™ behavioral fingerprinting detects when models diverge from baseline. Alert on JS divergence, recommend retraining.</div><div class="tpl-tag">AGENTDNA™</div></div>
+      <div class="tpl-c" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">🔦</div><div class="tpl-name">Shadow AI Detector</div><div class="tpl-desc">Auto-discover ungoverned AI systems and agents. Classify, risk-score, and trigger onboarding workflows for shadow systems.</div><div class="tpl-tag">ZERO-DAY</div></div>
+      <div class="tpl-c" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">📋</div><div class="tpl-name">Evidence Collector</div><div class="tpl-desc">Automatically gather, tag, and map compliance evidence. Reuse across frameworks to eliminate duplicate work and save team hours.</div><div class="tpl-tag">10× FASTER</div></div>
+      <div class="tpl-c" onclick="selTpl(this)"><span class="tpl-check">✓</span><div class="tpl-ico">⚡</div><div class="tpl-name">Incident Responder</div><div class="tpl-desc">Auto-triage AI incidents, assess severity, notify stakeholders, generate remediation plans. Integrates with Jira and ServiceNow.</div><div class="tpl-tag">SLA-DRIVEN</div></div>
+    </div>
+    <div class="fld">
+      <label>Or describe in plain English — AI converts to full agent config</label>
+      <textarea rows="3" placeholder='"I want an agent that audits our credit scoring model monthly for racial bias, checks against ECOA, and opens a Jira ticket if disparate impact is found"'></textarea>
+      <div class="fld-hint">✦ Powered by Claude — natural language → working enforcement logic</div>
+    </div>
+    <div class="ab-nav"><div></div><button class="btn-ab btn-ab-p" onclick="abNext()">Next: Goals & Vertical →</button></div>
+  </div>
+  <div class="ab-body" id="ab-s2" style="display:none">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:14px;letter-spacing:-.3px">Define goals & industry context</div>
+    <div class="fld-row"><div class="fld"><label>Agent Name</label><input type="text" value="Credit Model Bias Auditor" placeholder="e.g. Credit Model Bias Auditor Q2"></div><div class="fld"><label>Owner / Team</label><input type="text" placeholder="e.g. Risk Analytics Team"></div></div>
+    <div class="fld"><label>Primary governance question</label><input type="text" value="Does this AI system treat all demographic groups equitably?" placeholder="What specific question should this agent answer?"></div>
+    <div class="fld">
+      <label>Industry Vertical — applies specialized regulations automatically</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+        <div class="trig on" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">Financial Services</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">ECOA, Fair Housing, CFPB</div></div>
+        <div class="trig" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">Healthcare</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">ACA §1557, HIPAA</div></div>
+        <div class="trig" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">HR & Hiring</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">Title VII, EEOC, NYC LL 144</div></div>
+        <div class="trig" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">Criminal Justice</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">Due Process, COMPAS precedent</div></div>
+        <div class="trig" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">Education</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">Title VI, SFFA v. Harvard</div></div>
+        <div class="trig" style="text-align:left;padding:9px 12px" onclick="selVert(this)"><div style="font-size:12.5px;color:var(--t1)">General Enterprise</div><div style="font-size:9.5px;color:var(--t3);margin-top:1px">EU AI Act, NIST, ISO 42001</div></div>
+      </div>
+    </div>
+    <div class="ab-nav"><button class="btn-ab btn-ab-s" onclick="abPrev()">← Back</button><button class="btn-ab btn-ab-p" onclick="abNext()">Next: Protocols →</button></div>
+  </div>
+  <div class="ab-body" id="ab-s3" style="display:none">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:14px;letter-spacing:-.3px">Configure protocols & metrics</div>
+    <div style="font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:9px">Compliance Frameworks</div>
+    <div class="proto-g"><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">EU AI Act<br><span style="font-size:9.5px;color:var(--t3)">Art. 9, 10, 13</span></div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">NIST AI RMF<br><span style="font-size:9.5px;color:var(--t3)">GOVERN/MAP/MEASURE</span></div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">ISO 42001<br><span style="font-size:9.5px;color:var(--t3)">Mgmt system</span></div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">ECOA/Fair Housing<br><span style="font-size:9.5px;color:var(--t3)">4/5 Rule</span></div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">NYC LL 144<br><span style="font-size:9.5px;color:var(--t3)">Annual bias audit</span></div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">SOC 2 Type II<br><span style="font-size:9.5px;color:var(--t3)">AI controls</span></div></div></div>
+    <div style="font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin:14px 0 9px">Fairness Metrics (Corbett-Davies et al., 2023)</div>
+    <div class="proto-g"><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Demographic Parity<br><span style="font-size:9.5px;color:var(--t3)">Equal positive rates</span></div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Disparate Impact<br><span style="font-size:9.5px;color:var(--t3)">EEOC 4/5 rule</span></div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Equal Opportunity<br><span style="font-size:9.5px;color:var(--t3)">TPR parity</span></div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">Calibration<br><span style="font-size:9.5px;color:var(--t3)">Score accuracy</span></div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">Counterfactual<br><span style="font-size:9.5px;color:var(--t3)">Name swap</span></div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Alignment Gap<br><span style="font-size:9.5px;color:var(--t3)">Ideal-target scoring</span></div></div></div>
+    <div class="ab-nav"><button class="btn-ab btn-ab-s" onclick="abPrev()">← Back</button><button class="btn-ab btn-ab-p" onclick="abNext()">Next: Triggers →</button></div>
+  </div>
+  <div class="ab-body" id="ab-s4" style="display:none">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:14px;letter-spacing:-.3px">Triggers, data sources & integrations</div>
+    <div class="fld"><label>Trigger Type</label><div class="trig-p"><button class="trig on" onclick="sTrig(this)">⏰ Scheduled</button><button class="trig" onclick="sTrig(this)">⚡ Event-driven</button><button class="trig" onclick="sTrig(this)">🔗 Webhook</button><button class="trig" onclick="sTrig(this)">▶ Manual only</button></div></div>
+    <div class="fld-row"><div class="fld"><label>Schedule</label><select><option>Weekly — Mon 09:00 UTC</option><option>Daily</option><option>Monthly</option><option>Custom CRON</option></select></div><div class="fld"><label>Event: auto-run when</label><select><option>Model redeployment detected</option><option>Drift score exceeds threshold</option><option>Incident ticket opened</option></select></div></div>
+    <div class="fld"><label>Data Sources & Connected Integrations</label>
+    <div class="proto-g"><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">OpenAI API Logs</div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Anthropic Usage</div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">Collibra (lineage)</div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Jira (tickets)</div></div><div class="proto" onclick="tProto(this)"><div class="proto-chk"></div><div class="proto-lbl">ServiceNow GRC</div></div><div class="proto on" onclick="tProto(this)"><div class="proto-chk">✓</div><div class="proto-lbl">Slack (alerts)</div></div></div></div>
+    <div class="ab-nav"><button class="btn-ab btn-ab-s" onclick="abPrev()">← Back</button><button class="btn-ab btn-ab-p" onclick="abNext()">Next: Permissions →</button></div>
+  </div>
+  <div class="ab-body" id="ab-s5" style="display:none">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:14px;letter-spacing:-.3px">Autonomy & permissions</div>
+    <div class="fld"><label>Autonomy Level</label><div class="auto-g"><div class="auto" onclick="sAuto(this)"><div class="auto-lv">LEVEL 1</div><div class="auto-name">Observe</div><div class="auto-desc">Reads data, reports only</div></div><div class="auto on" onclick="sAuto(this)"><div class="auto-lv">LEVEL 2</div><div class="auto-name">Recommend</div><div class="auto-desc">Reports + notifies</div></div><div class="auto" onclick="sAuto(this)"><div class="auto-lv">LEVEL 3</div><div class="auto-name">Propose</div><div class="auto-desc">Drafts actions, needs OK</div></div><div class="auto" onclick="sAuto(this)"><div class="auto-lv">LEVEL 4</div><div class="auto-name">Execute</div><div class="auto-desc">Acts autonomously</div></div></div></div>
+    <div class="pn" style="margin-bottom:14px"><div class="pnh"><div class="pnt">Permissions</div></div>
+      <div class="perm-row"><div><div class="perm-name">Read model outputs & logs</div><div class="perm-desc">Access AI system telemetry</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div class="perm-row"><div><div class="perm-name">Write to evidence library</div><div class="perm-desc">Auto-file audit evidence</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div class="perm-row"><div><div class="perm-name">Create Jira tickets</div><div class="perm-desc">Open tickets on violations</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div class="perm-row"><div><div class="perm-name">Send Slack alerts</div><div class="perm-desc">Notify #ai-governance</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div class="perm-row"><div><div class="perm-name">⚠ Kill switch — suspend AI system</div><div class="perm-desc">Halt target on critical violation</div></div><label class="tgl"><input type="checkbox"><span class="tgl-s"></span></label></div>
+    </div>
+    <div class="ab-nav"><button class="btn-ab btn-ab-s" onclick="abPrev()">← Back</button><button class="btn-ab btn-ab-p" onclick="abNext()">Review & Deploy →</button></div>
+  </div>
+  <div class="ab-body" id="ab-s6" style="display:none">
+    <div style="font-family:var(--fh);font-size:17px;font-weight:600;color:var(--t1);margin-bottom:14px;letter-spacing:-.3px">Review & deploy</div>
+    <div class="rev-sec"><div class="rev-sec-t">Agent Identity</div><div class="rev-row"><span class="rev-k">Name</span><span class="rev-v">Credit Model Bias Auditor</span></div><div class="rev-row"><span class="rev-k">Template</span><span class="rev-v">Bias Auditor</span></div><div class="rev-row"><span class="rev-k">Vertical</span><span class="rev-v">Financial Services</span></div></div>
+    <div class="rev-sec"><div class="rev-sec-t">Protocols Active</div><div class="rev-row"><span class="rev-k">Frameworks</span><span class="rev-v">EU AI Act · NIST RMF · ECOA</span></div><div class="rev-row"><span class="rev-k">Metrics</span><span class="rev-v">Demographic Parity · Disparate Impact · Equal Opportunity · Alignment Gap</span></div></div>
+    <div class="rev-sec"><div class="rev-sec-t">Operations</div><div class="rev-row"><span class="rev-k">Schedule</span><span class="rev-v">Weekly — Mon 09:00 UTC</span></div><div class="rev-row"><span class="rev-k">Autonomy</span><span class="rev-v">Level 2 — Recommend</span></div><div class="rev-row"><span class="rev-k">Integrations</span><span class="rev-v">OpenAI · Anthropic · Jira · Slack</span></div></div>
+    <div style="background:var(--lime-d);border:1px solid var(--b1);border-radius:7px;padding:12px;margin-bottom:14px"><div style="font-family:var(--fm);font-size:8.5px;color:var(--lime);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">AgentDNA™ Profile</div><div style="font-size:12px;color:var(--t1);line-height:1.6">Behavioral fingerprint activates after 5 runs. Anomaly detection goes live in ~3 weeks once baseline is established.</div></div>
+    <div class="ab-nav">
+      <button class="btn-ab btn-ab-s" onclick="abPrev()">← Back</button>
+      <div style="display:flex;gap:7px"><button class="btn-ab btn-ab-s" onclick="nav('library')">Save draft</button><button class="btn-ab btn-ab-p" onclick="deployAgent()">✦ Deploy Agent →</button></div>
+    </div>
+  </div>
+  <div class="run-s" id="ab-run">
+    <div style="font-family:var(--fh);font-size:15px;font-weight:300;color:var(--t3)">Credit Model Bias Auditor</div>
+    <div class="run-pct" id="rp">0%</div>
+    <div class="run-stage" id="rs">Initializing...</div>
+    <div class="run-bar"><div class="run-fill" id="rf" style="width:0%"></div></div>
+    <div class="run-log" id="rl"><div class="lline"><span class="lts">[--:--]</span> Agent standby<span class="cursor-b"></span></div></div>
+    <button class="btn-ab btn-ab-p" id="rfin" style="display:none;margin-top:8px" onclick="nav('library')">View Agent Library →</button>
+  </div>
+</div>
+
+<!-- ═══ AGENT LIBRARY ═══ -->
+<div class="page" id="page-library">
+  <div class="ph"><div><h1>Agent <i>Library</i></h1><p>Deployed governance agents. Each runs on schedule, reports findings automatically, and integrates with your existing workflows.</p></div><div class="ph-r"><button class="tb-btn p" onclick="nav('builder')">✦ Build New</button></div></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px">
+    <div class="alc"><div class="alc-type"><div class="alc-ico">⊕</div><span class="bd live">● Live</span></div><div class="alc-name">Credit Model Bias Auditor</div><div class="alc-desc">Weekly fairness audit · Race, gender, age · EU AI Act + ECOA · Auto-creates Jira tickets</div><div class="alc-meta"><span>Last run: <span class="rel-time" data-mins="4320">3d ago</span></span><span>·</span><span>Score: <span style="color:var(--red)">FAIL 62</span></span><button class="alc-run" onclick="runDemo()">▶ Run</button></div></div>
+    <div class="alc"><div class="alc-type"><div class="alc-ico">⚖</div><span class="bd live">● Live</span></div><div class="alc-name">EU AI Act Compliance Checker</div><div class="alc-desc">Daily sweep across 89 high-risk systems · Auto-collects evidence · Maps to EU AI Act articles</div><div class="alc-meta"><span>6h ago</span><span>·</span><span>Score: <span style="color:var(--lime)">PASS 88%</span></span><button class="alc-run">▶ Run</button></div></div>
+    <div class="alc"><div class="alc-type"><div class="alc-ico">📡</div><span class="bd rev">⚠ Alert</span></div><div class="alc-name">Model Drift Monitor</div><div class="alc-desc">Continuous AgentDNA™ fingerprinting · Jensen-Shannon divergence alerting · 38 agents tracked</div><div class="alc-meta"><span>Drift detected: Now</span><span>·</span><span>JS=<span style="color:var(--amb)">0.82</span></span><button class="alc-run" style="background:var(--red)">▶ Investigate</button></div></div>
+    <div class="alc"><div class="alc-type"><div class="alc-ico">🔦</div><span class="bd live">● Live</span></div><div class="alc-name">Shadow AI Detector</div><div class="alc-desc">Continuous discovery of ungoverned AI across all integrated data sources and API gateways</div><div class="alc-meta"><span>Found today: <span id="shadow-found">2</span></span><span>·</span><span>Total: <span style="color:var(--amb)">31</span></span><button class="alc-run">▶ Run</button></div></div>
+    <div class="alc"><div class="alc-type"><div class="alc-ico">⚡</div><span class="bd live">● Live</span></div><div class="alc-name">Incident Responder</div><div class="alc-desc">Auto-triages AI incidents from Jira, PagerDuty · Severity scoring · Remediation plans via Claude</div><div class="alc-meta"><span><span id="incident-open">3</span> open</span><span>·</span><span>Avg: <span style="color:var(--lime)">18h</span></span><button class="alc-run">▶ View</button></div></div>
+    <div class="alc" style="border-style:dashed;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;min-height:140px" onclick="nav('builder')">
+      <div style="font-size:22px">✦</div>
+      <div style="font-family:var(--fh);font-size:13px;color:var(--t2)">Build a new agent</div>
+      <div style="font-size:10.5px;color:var(--t3)">6-step wizard</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ POLICY ENGINE ═══ -->
+<div class="page" id="page-policy">
+  <div class="ph"><div><h1>Policy <i>Engine</i></h1><p>Document once, comply at scale. Pre-built policy packs with automated enforcement and audit-ready evidence generation.</p></div></div>
+  <div class="g2e">
+    <div class="pn"><div class="pnh"><div><div class="pnt">Framework Coverage</div></div></div><div class="cw" style="height:210px"><canvas id="policyRadar" role="img" aria-label="Policy radar">Policy coverage</canvas></div></div>
+    <div class="pn"><div class="pnh"><div class="pnt">Approval Pipeline</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bn)"><span style="font-size:12.5px;color:var(--t2)">Awaiting Legal Review</span><div style="display:flex;align-items:center;gap:9px"><div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--amb)">7</div><span class="bd rev">Pending</span></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bn)"><span style="font-size:12.5px;color:var(--t2)">Security Sign-off</span><div style="display:flex;align-items:center;gap:9px"><div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--blu)">4</div><span class="bd med">In Progress</span></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bn)"><span style="font-size:12.5px;color:var(--t2)">Approved, Pre-deploy</span><div style="display:flex;align-items:center;gap:9px"><div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--lime)">11</div><span class="bd ok">Ready</span></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0"><span style="font-size:12.5px;color:var(--t2)">Rejected / Rework</span><div style="display:flex;align-items:center;gap:9px"><div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--red)">2</div><span class="bd crit">Blocked</span></div></div>
+    </div>
+  </div>
+  <div class="pn"><div class="pnh"><div class="pnt">Active Policy Packs</div><span class="va" onclick="nav('evidence')">→ Evidence library</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 13px;background:var(--s2);border:1px solid var(--bn);border-radius:8px;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--bn2')" onmouseleave="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--bn')"><div style="width:32px;height:32px;border-radius:7px;background:var(--lime-d);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚖</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500;color:var(--t1)">EU AI Act — Full Compliance Pack</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Art.9 risk mgmt · Art.10 tech docs · Art.13 transparency · 47 controls</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--lime)">88%</div><div style="font-size:9.5px;color:var(--t3)">coverage</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 13px;background:var(--s2);border:1px solid var(--bn);border-radius:8px;cursor:pointer"><div style="width:32px;height:32px;border-radius:7px;background:var(--blu-d);border:1px solid rgba(10,132,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🛡</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500;color:var(--t1)">NIST AI RMF v1.0</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Govern · Map · Measure · Manage</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--blu)">94%</div><div style="font-size:9.5px;color:var(--t3)">coverage</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 13px;background:var(--s2);border:1px solid var(--bn);border-radius:8px;cursor:pointer"><div style="width:32px;height:32px;border-radius:7px;background:var(--amb-d);border:1px solid rgba(255,159,10,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📋</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500;color:var(--t1)">ISO 42001 — AI Management System</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Organizational controls · AI policy · Performance evaluation</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--amb)">79%</div><div style="font-size:9.5px;color:var(--t3)">coverage</div></div><label class="tgl"><input type="checkbox" checked><span class="tgl-s"></span></label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI ADVISOR ═══ -->
+<div class="page" id="page-advisor">
+  <div class="ph"><div><h1>AI <i>Advisor</i></h1><p>Ask anything in natural language. Full context of your live governance data — powered by Claude (real API calls).</p></div></div>
+  <!-- API Key input -->
+  <div id="key-bar" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;">
+    <span style="font-family:var(--fm);font-size:9px;color:var(--lime);letter-spacing:1px;white-space:nowrap">ANTHROPIC KEY</span>
+    <input id="adv-key" type="password" placeholder="sk-ant-..." autocomplete="off"
+      style="flex:1;max-width:420px;background:var(--s1);border:1px solid var(--bn);border-radius:6px;padding:7px 12px;font-family:var(--fm);font-size:12px;color:var(--t1);outline:none;transition:border-color .15s"
+      oninput="chkKey(this.value)" onfocus="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--b1')" onblur="this.style.borderColor=getComputedStyle(document.documentElement).getPropertyValue('--bn')">
+    <span id="key-st" style="font-family:var(--fm);font-size:9.5px;color:var(--t3)">Enter key to enable live responses</span>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" style="font-family:var(--fm);font-size:9px;color:var(--lime);text-decoration:none;white-space:nowrap;margin-left:auto">Get key →</a>
+  </div>
+  <div class="pn" style="padding:0;overflow:hidden">
+    <div class="conv-wrap">
+      <div class="conv-msgs" id="conv-msgs">
+        <div class="conv-msg"><div class="conv-av bot">M</div><div class="conv-bub">Hi — I'm Meridian's AI Governance Advisor, powered by Claude. I have full context of your governance posture: <strong>247 systems</strong>, <strong>18 open flags</strong>, <strong>$4.2M risk exposure</strong>, and <strong>3 critical incidents</strong>.<br><br>Enter your Anthropic API key above and ask me anything about your governance posture — compliance gaps, risk analysis, policy drafts, regulatory questions, or incident response.</div></div>
+      </div>
+      <div class="conv-chips" id="conv-chips">
+        <div class="conv-chip" onclick="askA(this.textContent)">What's my biggest EU AI Act gap?</div>
+        <div class="conv-chip" onclick="askA(this.textContent)">Explain Credit v3 bias risk in plain English</div>
+        <div class="conv-chip" onclick="askA(this.textContent)">Write a Jira ticket for the bias incident</div>
+        <div class="conv-chip" onclick="askA(this.textContent)">Generate a no-email-without-approval policy</div>
+        <div class="conv-chip" onclick="askA(this.textContent)">What should I prioritize this week?</div>
+      </div>
+      <div class="conv-inp"><input type="text" id="conv-i" placeholder="Ask about compliance, risk, agents, regulations..." onkeydown="if(event.key==='Enter')sendA()"><button class="conv-send" onclick="sendA()">↑</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GOVERNANCE GRAPH ═══ -->
+<div class="page" id="page-graph">
+  <div class="ph"><div><h1>Governance <i>Graph</i></h1><p>One connected graph — AI systems, risks, controls, evidence, requirements, frameworks. No silos. Evidence reuse across all frameworks automatically.</p></div></div>
+  <div class="pn" style="margin-bottom:14px">
+    <div class="pnh"><div><div class="pnt">Live Knowledge Graph</div><div class="pns">247 systems · 1,840 controls · 3,210 evidence items · 6 frameworks</div></div></div>
+    <div class="gg-wrap" id="govGraph"></div>
+    <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:var(--lime);display:inline-block"></span>AI Systems</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:var(--red);display:inline-block"></span>Risks</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:var(--blu);display:inline-block"></span>Controls</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:#30d158;display:inline-block"></span>Evidence</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:var(--amb);display:inline-block"></span>Requirements</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:9px;height:9px;border-radius:2px;background:var(--pur);display:inline-block"></span>Frameworks</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BIAS AUDITS ═══ -->
+<div class="page" id="page-bias">
+  <div class="ph"><div><h1>Bias & Fairness <i>Audits</i></h1><p>Demographic parity, equalized odds, calibration. Protected attribute breakdowns. Bertrand-Mullainathan audit methodology.</p></div><div class="ph-r"><button class="tb-btn p">+ Run New Audit</button></div></div>
+  <div class="g2e">
+    <div class="pn">
+      <div class="pnh"><div><div class="pnt">Credit Decisioning v3 — Bias Report</div><div class="pns">Run today 09:14 UTC · 16 API calls · 8 demographic groups</div></div><span class="bd crit">Fail</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t2);margin-bottom:10px"><span>Protected Attribute</span><span>Approval Rate</span><span>Δ vs Baseline</span></div>
+      <div class="ba-row"><div class="ba-attr">Gender: Male (ref)</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:72%;background:var(--lime)"></div></div></div><div class="ba-score" style="color:var(--lime)">72%</div><div class="ba-delta" style="color:var(--t3)">baseline</div></div>
+      <div class="ba-row"><div class="ba-attr">Gender: Female</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:61%;background:var(--amb)"></div></div></div><div class="ba-score" style="color:var(--amb)">61%</div><div class="ba-delta" style="color:var(--red)">−11pp ⚠</div></div>
+      <div class="ba-row"><div class="ba-attr">Race: White (ref)</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:70%;background:var(--lime)"></div></div></div><div class="ba-score" style="color:var(--lime)">70%</div><div class="ba-delta" style="color:var(--t3)">baseline</div></div>
+      <div class="ba-row"><div class="ba-attr">Race: Black</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:54%;background:var(--red)"></div></div></div><div class="ba-score" style="color:var(--red)">54%</div><div class="ba-delta" style="color:var(--red)">−16pp ⛔</div></div>
+      <div class="ba-row"><div class="ba-attr">Race: Hispanic</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:63%;background:var(--amb)"></div></div></div><div class="ba-score" style="color:var(--amb)">63%</div><div class="ba-delta" style="color:var(--amb)">−7pp ⚠</div></div>
+      <div class="ba-row"><div class="ba-attr">Age: 18–30</div><div class="ba-bwrap"><div class="ba-bg"><div class="ba-ref" style="left:72%"></div><div class="ba-fill" style="width:59%;background:var(--amb)"></div></div></div><div class="ba-score" style="color:var(--amb)">59%</div><div class="ba-delta" style="color:var(--amb)">−13pp ⚠</div></div>
+    </div>
+    <div>
+      <div class="pn" style="margin-bottom:11px"><div class="pnh"><div class="pnt">Fairness Metrics</div></div><div class="cw" style="height:190px"><canvas id="fairnessR" role="img" aria-label="Fairness radar">Fairness</canvas></div></div>
+      <div class="pn"><div class="pnh"><div class="pnt">Audit History</div></div>
+        <table style="font-size:11.5px"><thead><tr><th>Date</th><th>Model</th><th>Result</th></tr></thead>
+        <tbody><tr><td class="tdm">Today</td><td class="tdn">Credit v3</td><td><span class="bd crit">Fail</span></td></tr><tr><td class="tdm">3 days ago</td><td class="tdn">HR Screener</td><td><span class="bd hi">Warning</span></td></tr><tr><td class="tdm">1 week ago</td><td class="tdn">Fraud v7</td><td><span class="bd ok">Pass</span></td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DATA LINEAGE ═══ -->
+<div class="page" id="page-lineage">
+  <div class="ph"><div><h1>Data <i>Lineage</i></h1><p>Track data flows from training datasets through inference to downstream systems. Real-time privacy flag detection.</p></div></div>
+  <div class="pn" style="margin-bottom:14px">
+    <div class="pnh"><div><div class="pnt">Credit Decisioning v3 — Data Journey</div><div class="pns">3 privacy flags detected · Training pipeline → inference → downstream</div></div><span class="bd crit">3 Privacy Issues</span></div>
+    <div id="lineageSvg" style="overflow-x:auto;margin-top:16px"></div>
+  </div>
+  <div class="g3">
+    <div class="pn"><div class="pnh"><div class="pnt">Data Sources</div></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Credit Bureau API</span><span class="bd ok">Consented</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Transaction DB</span><span class="bd ok">Governed</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Third-party Enrichment</span><span class="bd crit">⚠ Unclear</span></div></div>
+    <div class="pn"><div class="pnh"><div class="pnt">Transformations</div></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Feature Engineering</span><span class="bd ok">Documented</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Anonymization Step</span><span class="bd hi">Partial</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Bias Mitigation Layer</span><span class="bd crit">Missing</span></div></div>
+    <div class="pn"><div class="pnh"><div class="pnt">Downstream Consumers</div></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Loan Officer Dashboard</span><span class="bd ok">Logged</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Auto-Denial System</span><span class="bd crit">High Risk</span></div><div class="tt-row"><span style="flex:1;font-size:12px;color:var(--t1)">Audit Export</span><span class="bd ok">Compliant</span></div></div>
+  </div>
+</div>
+
+<!-- ═══ INCIDENTS ═══ -->
+<div class="page" id="page-incidents">
+  <div class="ph"><div><h1>Incident <i>Response</i></h1><p>AI-powered triage, SLA enforcement, root cause analysis via Claude, and automated Jira/ServiceNow workflows.</p></div><div class="ph-r"><button class="tb-btn p">+ Log Incident</button></div></div>
+  <div class="kg"><div class="kc red"><div class="kc-lbl">Open Incidents</div><div class="kc-val">3</div><div class="kc-d"><span class="dn">↑ 1</span> this week</div></div><div class="kc amb"><div class="kc-lbl">SLA At Risk</div><div class="kc-val">2</div><div class="kc-d">Response window closing</div></div><div class="kc lime"><div class="kc-lbl">Resolved (30d)</div><div class="kc-val">14</div><div class="kc-d"><span class="up">↑ 2</span> vs prior period</div></div><div class="kc blu"><div class="kc-lbl">Avg Resolution</div><div class="kc-val" style="font-size:26px;letter-spacing:-1px">18h</div><div class="kc-d"><span class="up">↓ 6h</span> improvement</div></div></div>
+  <div class="pn">
+    <div class="pnh"><div class="pnt">Active Incidents</div></div>
+    <div class="inc crit"><div class="inc-ico" style="background:var(--red-d);color:var(--red)">⛔</div><div><div class="inc-t">Critical Bias Drift — Credit Decisioning v3</div><div class="inc-s">Demographic parity violation · Race attribute · EU AI Act Art. 9 breach · $1.9M exposure · 2,340 applications affected</div></div><div class="inc-m"><div class="inc-sla breach">SLA: <span id="sla-0">1h 59m 57s</span></div><div class="inc-ts">Opened 22h ago · Risk Team</div></div></div>
+    <div class="inc hi"><div class="inc-ico" style="background:var(--amb-d);color:var(--amb)">⚠</div><div><div class="inc-t">Data Leak Risk — Customer Churn Model</div><div class="inc-s">PII detected in model outputs · GDPR Art. 25 · 840 customer records at risk</div></div><div class="inc-m"><div class="inc-sla warn">SLA: <span id="sla-1">7h 59m 57s</span></div><div class="inc-ts">Opened 16h ago · Privacy Team</div></div></div>
+    <div class="inc med"><div class="inc-ico" style="background:var(--blu-d);color:var(--blu)">ℹ</div><div><div class="inc-t">Model Drift — Fraud Detection v7</div><div class="inc-s">4.2% F1 score degradation over 2 weeks · Retraining recommended</div></div><div class="inc-m"><div class="inc-sla ok">SLA: <span id="sla-2">71h 59m 57s</span></div><div class="inc-ts">Opened 2d ago · ML Engineering</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ EVIDENCE LIBRARY ═══ -->
+<div class="page" id="page-evidence">
+  <div class="ph"><div><h1>Evidence <i>Library</i></h1><p>Document once, reuse across all frameworks. Centralized evidence with auto-mapping and reuse factor tracking.</p></div><div class="ph-r"><button class="tb-btn p">+ Upload Evidence</button></div></div>
+  <div class="kg"><div class="kc lime"><div class="kc-lbl">Total Items</div><div class="kc-val">3,210</div></div><div class="kc blu"><div class="kc-lbl">Auto-mapped</div><div class="kc-val">1,840</div></div><div class="kc amb"><div class="kc-lbl">Pending Upload</div><div class="kc-val">47</div></div><div class="kc lime"><div class="kc-lbl">Avg Reuse Factor</div><div class="kc-val" style="font-size:26px">×4.2</div><div class="kc-d">Saved 6,800 hrs</div></div></div>
+  <div class="pn">
+    <div class="ev-item"><div class="ev-ico" style="background:var(--red-d);color:var(--red)">📋</div><div><div class="ev-name">Credit Model Risk Assessment v3</div><div class="ev-meta">EU AI Act Art.9 · NIST GOVERN · ISO 42001 6.1.2 · Updated today</div></div><div class="ev-r"><div class="ev-reuse">×14 frameworks</div><div class="ev-date">Today</div></div></div>
+    <div class="ev-item"><div class="ev-ico" style="background:var(--pur-d);color:var(--pur)">🔍</div><div><div class="ev-name">Bias Audit — Demographic Parity Analysis</div><div class="ev-meta">EU AI Act Art.10 · NYC LL 144 · NIST MANAGE · Updated today</div></div><div class="ev-r"><div class="ev-reuse">×8 frameworks</div><div class="ev-date">Today</div></div></div>
+    <div class="ev-item"><div class="ev-ico" style="background:var(--blu-d);color:var(--blu)">🛡</div><div><div class="ev-name">Penetration Test — AI System APIs</div><div class="ev-meta">SOC 2 CC6 · NIST MANAGE 2 · ISO 42001 9.1 · External auditor</div></div><div class="ev-r"><div class="ev-reuse">×6 frameworks</div><div class="ev-date">3 weeks ago</div></div></div>
+    <div class="ev-item"><div class="ev-ico" style="background:rgba(48,209,88,.1);color:#30d158">✓</div><div><div class="ev-name">Data Protection Impact Assessment (DPIA)</div><div class="ev-meta">GDPR Art.35 · EU AI Act Art.9 · ISO 42001 8.4 · 12 systems covered</div></div><div class="ev-r"><div class="ev-reuse">×11 frameworks</div><div class="ev-date">1 month ago</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ VENDORS ═══ -->
+<div class="page" id="page-vendors">
+  <div class="ph"><div><h1>Vendor <i>Portal</i></h1><p>Third-party AI risk assessments, documentation requests, and continuous vendor compliance monitoring across 24 vendors.</p></div><div class="ph-r"><button class="tb-btn p">+ Add Vendor</button></div></div>
+  <div class="kg"><div class="kc lime"><div class="kc-lbl">Vendors Tracked</div><div class="kc-val">24</div></div><div class="kc amb"><div class="kc-lbl">Pending Assessments</div><div class="kc-val">7</div></div><div class="kc lime"><div class="kc-lbl">Fully Compliant</div><div class="kc-val">14</div></div><div class="kc red"><div class="kc-lbl">High Risk</div><div class="kc-val">3</div></div></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px">
+    <div class="pn"><div style="display:flex;align-items:center;gap:9px;margin-bottom:12px"><div style="width:32px;height:32px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:15px">SF</div><div><div style="font-size:12.5px;font-weight:500">Salesforce Einstein</div><div style="font-size:10.5px;color:var(--t3)">CRM AI · 4 systems</div></div><span class="bd ok" style="margin-left:auto">Compliant</span></div><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t2);margin-bottom:4px"><span>Risk Score</span><span style="font-family:var(--fm);color:var(--lime)">Low — 22</span></div><div style="height:3px;background:var(--s3);border-radius:99px"><div style="width:22%;height:3px;background:var(--lime);border-radius:99px"></div></div><div style="font-size:10.5px;color:var(--t2);margin-top:8px">Docs: <span style="color:#30d158">✓ Complete</span></div></div>
+    <div class="pn"><div style="display:flex;align-items:center;gap:9px;margin-bottom:12px"><div style="width:32px;height:32px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:15px">MS</div><div><div style="font-size:12.5px;font-weight:500">Microsoft Azure AI</div><div style="font-size:10.5px;color:var(--t3)">Infrastructure · 12 systems</div></div><span class="bd ok" style="margin-left:auto">Compliant</span></div><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t2);margin-bottom:4px"><span>Risk Score</span><span style="font-family:var(--fm);color:var(--blu)">Low — 31</span></div><div style="height:3px;background:var(--s3);border-radius:99px"><div style="width:31%;height:3px;background:var(--blu);border-radius:99px"></div></div><div style="font-size:10.5px;color:var(--t2);margin-top:8px">Docs: <span style="color:#30d158">✓ Complete</span></div></div>
+    <div class="pn"><div style="display:flex;align-items:center;gap:9px;margin-bottom:12px"><div style="width:32px;height:32px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:15px">OA</div><div><div style="font-size:12.5px;font-weight:500">OpenAI (API)</div><div style="font-size:10.5px;color:var(--t3)">LLM Provider · 8 systems</div></div><span class="bd rev" style="margin-left:auto">Review</span></div><div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t2);margin-bottom:4px"><span>Risk Score</span><span style="font-family:var(--fm);color:var(--amb)">High — 68</span></div><div style="height:3px;background:var(--s3);border-radius:99px"><div style="width:68%;height:3px;background:var(--amb);border-radius:99px"></div></div><div style="font-size:10.5px;color:var(--t2);margin-top:8px">Docs: <span style="color:var(--amb)">⚠ 3 missing</span></div></div>
+  </div>
+</div>
+
+<!-- ═══ REGULATORY TRACKER ═══ -->
+<div class="page" id="page-regs">
+  <div class="ph"><div><h1>Regulatory <i>Tracker</i></h1><p>Live global AI regulation tracker — enforcement dates, compliance status, and auto-mapping to your policy packs.</p></div></div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="kc red" style="border-radius:10px"><div class="kc-lbl">Enforced Now</div><div class="kc-val">7</div><div class="kc-d">Active in your markets</div></div>
+    <div class="kc amb" style="border-radius:10px"><div class="kc-lbl">Coming 12 Months</div><div class="kc-val">11</div><div class="kc-d">Requiring action now</div></div>
+    <div class="kc lime" style="border-radius:10px"><div class="kc-lbl">Fully Mapped</div><div class="kc-val">5</div><div class="kc-d">To Meridian policy packs</div></div>
+  </div>
+  <div class="pn">
+    <div class="reg-item"><div class="reg-flag">🇪🇺</div><div><div class="reg-n">EU AI Act</div><div class="reg-d">GPAI provisions enforced · High-risk AI systems deadline Aug 2026</div></div><div class="reg-r"><div class="reg-date">Aug 2026</div><div class="reg-s">Partial enforcement now</div></div><span class="bd rev" style="margin-left:12px">Active</span></div>
+    <div class="reg-item"><div class="reg-flag">🇺🇸</div><div><div class="reg-n">NYC Local Law 144 (AEDTs)</div><div class="reg-d">Automated Employment Decision Tools · Annual bias audits required</div></div><div class="reg-r"><div class="reg-date">Jul 2023</div><div class="reg-s">Enforced now</div></div><span class="bd crit" style="margin-left:12px">Must comply</span></div>
+    <div class="reg-item"><div class="reg-flag">🇺🇸</div><div><div class="reg-n">US AI Governance Act (proposed)</div><div class="reg-d">NIST AI RMF adoption · Sectoral rules hardening · EO 14110 successor</div></div><div class="reg-r"><div class="reg-date">TBD 2026</div><div class="reg-s">Draft phase</div></div><span class="bd med" style="margin-left:12px">Monitor</span></div>
+    <div class="reg-item"><div class="reg-flag">🇬🇧</div><div><div class="reg-n">UK AI Regulation Approach</div><div class="reg-d">Pro-innovation, sector-specific · AI Safety Institute oversight</div></div><div class="reg-r"><div class="reg-date">2025–2026</div><div class="reg-s">Evolving</div></div><span class="bd hi" style="margin-left:12px">Watch</span></div>
+    <div class="reg-item"><div class="reg-flag">🌐</div><div><div class="reg-n">ISO/IEC 42001:2023</div><div class="reg-d">International AI Management System Standard</div></div><div class="reg-r"><div class="reg-date">Published 2023</div><div class="reg-s">Active standard</div></div><span class="bd ok" style="margin-left:12px">Covered</span></div>
+  </div>
+</div>
+
+<!-- ═══ INTEGRATION HUB ═══ -->
+<div class="page" id="page-integrations">
+  <div class="ph"><div><h1>Integration <i>Hub</i></h1><p>40+ governance, identity, compliance, and workflow integrations. Connected integrations feed live data into agents and risk assessments.</p></div><div class="ph-r"><button class="tb-btn p">+ New Integration</button></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+    <div>
+      <div class="int-cat"><div class="int-cat-t">Identity & Access</div><div class="int-item conn"><div class="int-logo">🔐</div><div><div class="int-name">Okta</div><div class="int-status">● Connected · <span data-sync-mins="2">Synced 2m ago</span></div></div><button class="int-btn">✓ Connected</button></div><div class="int-item conn"><div class="int-logo">🔷</div><div><div class="int-name">Azure AD (Entra ID)</div><div class="int-status">● <span id="azure-users">1,240</span> users synced</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">G</div><div><div class="int-name">Google Workspace</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">GRC / Risk & Compliance</div><div class="int-item conn"><div class="int-logo">🛡</div><div><div class="int-name">OneTrust</div><div class="int-status">● Connected · Privacy risks synced</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item conn"><div class="int-logo">⚙</div><div><div class="int-name">ServiceNow GRC</div><div class="int-status">● Risk register live · <span data-sync-mins="1">1m ago</span></div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">M</div><div><div class="int-name">MetricStream</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">R</div><div><div class="int-name">RSA Archer</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">Policy & Documentation</div><div class="int-item conn"><div class="int-logo">📝</div><div><div class="int-name">Confluence</div><div class="int-status">● Policy docs synced</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">N</div><div><div class="int-name">Notion</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">S</div><div><div class="int-name">SharePoint</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">📁</div><div><div class="int-name">Google Drive</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">Legal & Regulatory</div><div class="int-item"><div class="int-logo">⚖</div><div><div class="int-name">Ironclad</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">✍</div><div><div class="int-name">DocuSign CLM</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">📚</div><div><div class="int-name">Westlaw / LexisNexis</div><div class="int-status">Not connected · Regulatory reference</div></div><button class="int-btn">Connect</button></div></div>
+    </div>
+    <div>
+      <div class="int-cat"><div class="int-cat-t">Incident & Case Management</div><div class="int-item conn"><div class="int-logo">⚡</div><div><div class="int-name">Jira</div><div class="int-status">● <span id="jira-tickets">14</span> open tickets</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item conn"><div class="int-logo">⚙</div><div><div class="int-name">ServiceNow (ITSM)</div><div class="int-status">● Incident sync active</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">Z</div><div><div class="int-name">Zendesk</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">Audit & Controls</div><div class="int-item conn"><div class="int-logo">📊</div><div><div class="int-name">AuditBoard</div><div class="int-status">● Controls mapped · <span data-sync-mins="8">8m ago</span></div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">W</div><div><div class="int-name">Workiva</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">SAP</div><div><div class="int-name">SAP GRC</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">Data Governance & Privacy</div><div class="int-item"><div class="int-logo">🗄</div><div><div class="int-name">Collibra</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">A</div><div><div class="int-name">Alation</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">🔒</div><div><div class="int-name">BigID</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div><div class="int-item"><div class="int-logo">T</div><div><div class="int-name">TrustArc</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+      <div class="int-cat"><div class="int-cat-t">Model / AI Usage + Communications</div><div class="int-item conn"><div class="int-logo">🤖</div><div><div class="int-name">OpenAI Usage Logs</div><div class="int-status">● Live telemetry · <span data-sync-mins="0">active now</span></div></div><button class="int-btn">✓ Connected</button></div><div class="int-item conn"><div class="int-logo">◈</div><div><div class="int-name">Anthropic Usage</div><div class="int-status">● <span id="claude-log-count">2,841</span> calls logged today</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item conn"><div class="int-logo">💬</div><div><div class="int-name">Slack</div><div class="int-status">● #ai-governance · <span id="slack-msgs">47</span> msgs today</div></div><button class="int-btn">✓ Connected</button></div><div class="int-item"><div class="int-logo">📱</div><div><div class="int-name">Microsoft Teams</div><div class="int-status">Not connected</div></div><button class="int-btn">Connect</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUDIT TRAIL ═══ -->
+<div class="page" id="page-audit">
+  <div class="ph"><div><h1>Audit <i>Trail</i></h1><p>Complete, tamper-evident record of every AI governance action and decision — with full transparency explanations.</p></div><div class="ph-r"><button class="tb-btn">↓ Export PDF</button></div></div>
+  <div class="pn">
+    <div class="pnh"><div class="pnt">Decision Trail — Last 24h</div></div>
+    <div class="tt-row"><span class="tt-ts">09:14 UTC</span><div class="tt-ico" style="background:var(--red-d);color:var(--red)">⛔</div><div><div class="tt-t">Agent blocked — Procurement Autopilot → commit $14,200 PO</div><div class="tt-s">Policy: SPEND_LIMIT_$10K · Risk score: 72 · Enforcement latency: 7ms</div></div><div class="tt-why"><div class="why-btn" onclick="tWhy(this)">ⓘ WHY BLOCKED</div><div class="why-panel"><div class="why-title">Blocking Reasoning</div><div class="why-row"><span class="why-factor">Exceeds $10K spend limit</span><div class="why-bar"><div class="why-fill" style="width:90%"></div></div><span class="why-pct">90%</span></div><div class="why-row"><span class="why-factor">Autonomy level: execute-limited</span><div class="why-bar"><div class="why-fill" style="width:60%"></div></div><span class="why-pct">60%</span></div><div class="why-conf">Policy: SPEND_LIMIT_$10K · Engine v2.1 · Latency: 7ms</div></div></div></div>
+    <div class="tt-row"><span class="tt-ts">08:52 UTC</span><div class="tt-ico" style="background:var(--lime-d);color:var(--lime)">✓</div><div><div class="tt-t">Risk assessment completed — Fraud Detection v7</div><div class="tt-s">Score: 44/100 · Exposure: $410K · Next: 24h</div></div><div class="tt-why"><div class="why-btn" onclick="tWhy(this)">ⓘ WHY 44</div><div class="why-panel"><div class="why-title">Score Breakdown</div><div class="why-row"><span class="why-factor">Explainability gap</span><div class="why-bar"><div class="why-fill" style="width:60%"></div></div><span class="why-pct">44%</span></div><div class="why-conf">Confidence: 87% · claude-sonnet-4-6</div></div></div></div>
+    <div class="tt-row"><span class="tt-ts">08:01 UTC</span><div class="tt-ico" style="background:var(--blu-d);color:var(--blu)">ℹ</div><div><div class="tt-t">EU AI Act policy pack auto-updated — 34 systems</div><div class="tt-s">NIST RMF v1.1 changes propagated · 0 violations introduced</div></div><div class="tt-why"></div></div>
+  </div>
+</div>
+
+<!-- ═══ ROI CALCULATOR ═══ -->
+<div class="page" id="page-roi">
+  <div class="ph"><div><h1>ROI <i>Calculator</i></h1><p>Quantify your governance investment. Methodology from the Credo AI 2026 Executive Playbook — organizations report 10× faster compliance and 18-month average payback.</p></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:18px">
+    <div class="pn">
+      <div class="pnh"><div class="pnt">Your Organization</div></div>
+      <div class="slg"><div class="slh"><span class="sl-n">Annual AI budget ($M)</span><span class="sl-v" id="s1v">$25M</span></div><input type="range" min="1" max="500" value="25" step="1" id="s1" oninput="calcROI()"></div>
+      <div class="slg"><div class="slh"><span class="sl-n">AI systems managed</span><span class="sl-v" id="s2v">120</span></div><input type="range" min="5" max="2000" value="120" step="5" id="s2" oninput="calcROI()"></div>
+      <div class="slg"><div class="slh"><span class="sl-n">Manual governance hrs/week</span><span class="sl-v" id="s3v">15 hrs</span></div><input type="range" min="2" max="80" value="15" step="1" id="s3" oninput="calcROI()"></div>
+      <div class="slg"><div class="slh"><span class="sl-n">Compliance engineer salary ($K)</span><span class="sl-v" id="s4v">$145K</span></div><input type="range" min="60" max="400" value="145" step="5" id="s4" oninput="calcROI()"></div>
+      <div class="slg"><div class="slh"><span class="sl-n">AI risk incidents/year</span><span class="sl-v" id="s5v">4</span></div><input type="range" min="0" max="50" value="4" step="1" id="s5" oninput="calcROI()"></div>
+      <div class="slg"><div class="slh"><span class="sl-n">Avg incident cost ($K)</span><span class="sl-v" id="s6v">$850K</span></div><input type="range" min="50" max="10000" value="850" step="50" id="s6" oninput="calcROI()"></div>
+    </div>
+    <div class="pn">
+      <div style="font-family:var(--fm);font-size:8.5px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:9px">3-Year Projected ROI</div>
+      <div class="roi-big" id="roi-pct">—</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:18px" id="roi-sub">Calculating...</div>
+      <div class="cw" style="height:150px;margin-bottom:16px"><canvas id="roiChart" role="img" aria-label="ROI chart">ROI</canvas></div>
+      <div id="roi-lines">
+        <div class="roi-line"><span style="font-size:12.5px;color:var(--t2)">Manual labor savings (3yr)</span><span class="roi-lv pos" id="r1">—</span></div>
+        <div class="roi-line"><span style="font-size:12.5px;color:var(--t2)">Incident avoidance (3yr)</span><span class="roi-lv pos" id="r2">—</span></div>
+        <div class="roi-line"><span style="font-size:12.5px;color:var(--t2)">Review velocity value (3yr)</span><span class="roi-lv pos" id="r3">—</span></div>
+        <div class="roi-line"><span style="font-size:12.5px;color:var(--t2)">Platform cost (3yr est.)</span><span class="roi-lv neg" id="r4">—</span></div>
+        <div class="roi-line"><span style="font-size:12.5px;font-weight:500;color:var(--t1)">Net Value Created</span><span class="roi-lv pos" style="font-size:16px" id="r5">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATURITY ═══ -->
+<div class="page" id="page-maturity">
+  <div class="ph"><div><h1>Governance <i>Maturity</i></h1><p>6-level assessment from the 2026 AI Governance Playbook. Current level: 4 — Managed & Automated.</p></div></div>
+  <div class="mat-row"><div class="ms done"><div class="ms-num">1</div><div class="ms-lbl">Reactive / Ad Hoc</div></div><div class="ms done"><div class="ms-num">2</div><div class="ms-lbl">Aware / Manual</div></div><div class="ms done"><div class="ms-num">3</div><div class="ms-lbl">Defined / Documented</div></div><div class="ms cur"><div class="ms-marker">YOU ARE HERE</div><div class="ms-num">4</div><div class="ms-lbl">Managed / Automated</div></div><div class="ms"><div class="ms-num">5</div><div class="ms-lbl">Optimized / Continuous</div></div><div class="ms"><div class="ms-num">6</div><div class="ms-lbl">Autonomous / Trusted</div></div></div>
+  <div class="g2e">
+    <div class="pn"><div class="pnh"><div><div class="pnt">Maturity by Dimension</div><div class="pns">Current vs. Level 5 target</div></div></div><div class="cw" style="height:260px"><canvas id="matRadar" role="img" aria-label="Maturity">Maturity</canvas></div></div>
+    <div class="pn"><div class="pnh"><div class="pnt">Priority Gaps to Level 5</div></div>
+      <div style="padding:12px 0;border-bottom:1px solid var(--bn)"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12.5px;color:var(--t1)">Agentic Governance Controls</span><span class="bd crit">Gap: 2.1</span></div><div style="height:4px;background:var(--s3);border-radius:99px"><div style="width:35%;height:4px;background:var(--red);border-radius:99px"></div></div></div>
+      <div style="padding:12px 0;border-bottom:1px solid var(--bn)"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12.5px;color:var(--t1)">Continuous Monitoring</span><span class="bd hi">Gap: 1.3</span></div><div style="height:4px;background:var(--s3);border-radius:99px"><div style="width:55%;height:4px;background:var(--amb);border-radius:99px"></div></div></div>
+      <div style="padding:12px 0"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12.5px;color:var(--t1)">Evidence Automation</span><span class="bd med">Gap: 0.9</span></div><div style="height:4px;background:var(--s3);border-radius:99px"><div style="width:68%;height:4px;background:var(--blu);border-radius:99px"></div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ NIST TRUSTWORTHINESS ASSESSMENT ═══ -->
+<div class="page" id="page-nist">
+  <div class="ph">
+    <div class="ph-l">
+      <h1>NIST <i>Trustworthiness</i></h1>
+      <p>Evaluate any AI system against the 7 NIST AI RMF trustworthiness characteristics. Based on NIST AI 100-1 Section 3.</p>
+    </div>
+    <div class="ph-r">
+      <select id="nist-system" style="background:var(--s2);border:1px solid var(--bn);border-radius:6px;padding:7px 12px;font-family:var(--fb);font-size:13px;color:var(--t1);outline:none;cursor:pointer" onchange="loadNistSystem(this.value)">
+        <option value="credit">Credit Decisioning v3</option>
+        <option value="hr">HR Resume Screener</option>
+        <option value="fraud">Fraud Detection v7</option>
+        <option value="churn">Customer Churn Model</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,rgba(191,255,0,.04),rgba(10,132,255,.03));border:1px solid var(--b1);border-radius:10px;padding:16px;margin-bottom:18px">
+    <div style="font-family:var(--fm);font-size:9px;color:var(--lime);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">NIST AI RMF — Section 3 Assessment</div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.65">Trustworthiness is a social concept that "ranges across a spectrum and is only as strong as its weakest characteristics." Valid & Reliable is the necessary base; Accountable & Transparent spans all others. Addressing characteristics individually will not ensure system trustworthiness — tradeoffs are usually involved.</div>
+  </div>
+
+  <div id="nist-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:11px"></div>
+
+  <div class="pn" style="margin-top:14px">
+    <div class="pnh"><div class="pnt">NIST Trustworthiness Radar</div><span class="va" onclick="nav('advisor')">→ Ask AI Advisor for remediation plan</span></div>
+    <div class="cw" style="height:260px"><canvas id="nistRadar" role="img" aria-label="NIST trustworthiness">NIST chart</canvas></div>
+  </div>
+</div>
+
+</div><!-- .main -->
+
+<!-- ─── FAB ─── -->
+<div class="fab"><button class="fab-btn" onclick="nav('advisor')" title="AI Advisor">M</button></div>
+
+<!-- ─── CMD PALETTE ─── -->
+<div class="cmd-ov" id="cmdOv" onclick="if(event.target===this)closeCmd()">
+  <div class="cmd-box">
+    <div class="cmd-inp"><span style="color:var(--t3);font-size:13px">⌕</span><input type="text" id="cmdI" placeholder="Navigate, run agent, ask advisor..." oninput="fCmd(this.value)"><span style="font-family:var(--fm);font-size:8.5px;color:var(--t3);background:var(--s3);border:1px solid var(--bn);border-radius:3px;padding:1px 4px;flex-shrink:0">ESC</span></div>
+    <div class="cmd-r" id="cmdR"></div>
+  </div>
+</div>
+
+<script>
+// ─── NAV ───
+const PM={
+  dashboard:'Overview',registry:'AI Registry',agents:'Agent Monitor',risk:'Risk Intelligence',
+  builder:'Agent Builder',library:'Agent Library',policy:'Policy Engine',advisor:'AI Advisor',
+  graph:'Governance Graph',bias:'Bias Audits',lineage:'Data Lineage',incidents:'Incidents',
+  evidence:'Evidence Library',vendors:'Vendor Portal',regs:'Regulatory Tracker',
+  integrations:'Integration Hub',audit:'Audit Trail',roi:'ROI Calculator',maturity:'Maturity Score',
+};
+function nav(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+  document.getElementById('page-'+id)?.classList.add('act');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')==="nav('"+id+"')")n.classList.add('act')});
+  document.getElementById('tb-title').textContent=PM[id]||id;
+  closeCmd();
+  if(id==='risk')setTimeout(animRings,80);
+  if(id==='roi')calcROI();
+  if(id==='graph')drawGovGraph();
+  if(id==='lineage')drawLineage();
+  if(id==='agents')drawAgents();
+  if(id==='policy')setTimeout(buildPolicyRadar,80);
+  if(id==='bias')setTimeout(buildFairnessRadar,80);
+  if(id==='maturity')setTimeout(buildMatRadar,80);
+}
+
+// ─── COUNTERS ───
+function animCnts(){document.querySelectorAll('[data-cnt]').forEach(el=>{const t=parseInt(el.dataset.cnt);let c=0;const ti=setInterval(()=>{c=Math.min(c+t/50,t);el.textContent=Math.round(c);if(c>=t){el.textContent=t;clearInterval(ti);}},18);});}
+window.addEventListener('load',()=>{animCnts();setTimeout(()=>{buildTrend();buildDonut();buildHeatmap();calcROI();},100);});
+
+// ─── COLORS ───
+const LM='#bfff00',RE='#ff2d55',AM='#ff9f0a',BL='#0a84ff',GR='#30d158',PU='#bf5af2',
+      T2='#8090b8',T3='#3a4f6e';
+
+// ─── CHARTS ───
+function buildTrend(){
+  const m=['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  const ctx=document.getElementById('trendChart');if(!ctx)return;
+  new Chart(ctx,{type:'line',data:{labels:[...m,'May','Jun','Jul'],datasets:[
+    {label:'Compliance%',data:[52,58,63,68,72,76,80,83,86,88,90,91,93,95,96],borderColor:LM,backgroundColor:'rgba(191,255,0,.06)',borderWidth:2,fill:true,tension:.4,pointRadius:2,pointBackgroundColor:LM,yAxisID:'y'},
+    {label:'Risk Flags',data:[41,39,38,35,30,28,26,24,22,20,19,18,16,14,12],borderColor:RE,borderDash:[4,3],borderWidth:2,fill:false,tension:.4,pointRadius:2,pointBackgroundColor:RE,yAxisID:'y1'},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(191,255,0,.03)'},ticks:{color:T3,font:{family:"'Space Mono'",size:8.5}}},y:{grid:{color:'rgba(191,255,0,.03)'},ticks:{color:T3,font:{family:"'Space Mono'",size:8.5},callback:v=>v+'%'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'rgba(255,45,85,.4)',font:{size:8.5}}}}}});
+}
+function buildDonut(){
+  const ctx=document.getElementById('donut');if(!ctx)return;
+  new Chart(ctx,{type:'doughnut',data:{labels:['Critical','High','Medium','Low'],datasets:[{data:[7,23,38,32],backgroundColor:[RE,AM,BL,LM],borderColor:'#0d1120',borderWidth:3,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});
+}
+let riskBarBuilt=false;
+function buildRiskBar(){
+  if(riskBarBuilt)return;riskBarBuilt=true;
+  const ctx=document.getElementById('riskBarChart');if(!ctx)return;
+  new Chart(ctx,{type:'bar',data:{labels:['Bias','Privacy','Security','Explainability','Hallucination','Drift'],datasets:[{data:[2520,840,640,410,280,180],backgroundColor:[RE,AM,AM,BL,BL,LM],borderRadius:4,barThickness:13}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(191,255,0,.03)'},ticks:{color:T3,font:{family:"'Space Mono'",size:8.5},callback:v=>'$'+v+'K'}},y:{grid:{display:false},ticks:{color:T2,font:{size:11}}}}}});
+}
+function buildPolicyRadar(){
+  const ctx=document.getElementById('policyRadar');if(!ctx||ctx._done)return;ctx._done=true;
+  new Chart(ctx,{type:'radar',data:{labels:['EU AI Act','NIST RMF','ISO 42001','SOC 2','GDPR','HITRUST'],datasets:[{data:[88,94,79,97,85,52],borderColor:LM,backgroundColor:'rgba(191,255,0,.07)',borderWidth:2,pointBackgroundColor:LM,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{grid:{color:'rgba(191,255,0,.07)'},angleLines:{color:'rgba(191,255,0,.07)'},pointLabels:{color:T2,font:{size:10}},ticks:{display:false},min:0,max:100}}}});
+}
+function buildFairnessRadar(){
+  const ctx=document.getElementById('fairnessR');if(!ctx||ctx._done)return;ctx._done=true;
+  new Chart(ctx,{type:'radar',data:{labels:['Demographic Parity','Equalized Odds','Calibration','Pred. Parity','Counterfactual'],datasets:[{label:'Credit v3',data:[42,58,71,65,39],borderColor:RE,backgroundColor:'rgba(255,45,85,.07)',borderWidth:2,pointBackgroundColor:RE,pointRadius:3},{label:'Threshold',data:[80,80,80,80,80],borderColor:'rgba(255,255,255,.1)',borderDash:[4,3],backgroundColor:'transparent',borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{grid:{color:'rgba(191,255,0,.07)'},angleLines:{color:'rgba(191,255,0,.07)'},pointLabels:{color:T2,font:{size:9.5}},ticks:{display:false},min:0,max:100}}}});
+}
+function buildMatRadar(){
+  const ctx=document.getElementById('matRadar');if(!ctx||ctx._done)return;ctx._done=true;
+  new Chart(ctx,{type:'radar',data:{labels:['AI Inventory','Risk Assess.','Policy Enforce.','Monitoring','Incident Resp.','Reporting'],datasets:[{label:'Current',data:[4.2,3.8,4.0,3.5,3.9,4.1],borderColor:LM,backgroundColor:'rgba(191,255,0,.07)',borderWidth:2,pointBackgroundColor:LM,pointRadius:3},{label:'Target',data:[5,5,5,5,5,5],borderColor:'rgba(10,132,255,.3)',borderDash:[4,3],backgroundColor:'rgba(10,132,255,.03)',borderWidth:1,pointRadius:2,pointBackgroundColor:BL}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{grid:{color:'rgba(191,255,0,.07)'},angleLines:{color:'rgba(191,255,0,.07)'},pointLabels:{color:T2,font:{size:10}},ticks:{display:false,backdropColor:'transparent'},min:0,max:5}}}});
+}
+
+// ─── COMPLIANCE RINGS ───
+function animRings(){
+  const rs=[{id:'r-eu',p:88,c:'#bfff00'},{id:'r-nist',p:94,c:'#0a84ff'},{id:'r-iso',p:79,c:'#ff9f0a'},{id:'r-soc',p:97,c:'#30d158'},{id:'r-gdpr',p:85,c:'#bf5af2'},{id:'r-hit',p:52,c:'#ff2d55'}];
+  rs.forEach(r=>{const el=document.getElementById(r.id);if(!el)return;setTimeout(()=>{el.style.strokeDashoffset=201-(201*r.p/100);},120);});
+  buildRiskBar();
+}
+
+// ─── HEATMAP ───
+function buildHeatmap(){
+  const el=document.getElementById('heatmap');if(!el)return;
+  const sys=['Credit v3','HR Screener','Fraud v7','Churn Model','Content Mod','GenAI Suite'];
+  const cats=['Bias','Privacy','Security','Explain.','Drift','Compliance'];
+  const data=[[87,42,61,73,55,88],[71,58,30,65,38,72],[22,71,44,33,28,45],[55,83,29,41,62,36],[18,24,38,22,15,29],[40,52,47,68,44,55]];
+  const cW=80,cH=36,pL=92,pT=32,W=pL+cats.length*cW+16,H=pT+sys.length*cH+12;
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="min-width:${W}px">`;
+  cats.forEach((c,i)=>s+=`<text x="${pL+i*cW+cW/2}" y="20" text-anchor="middle" fill="${T3}" font-size="9.5" font-family="Space Mono">${c}</text>`);
+  sys.forEach((n,si)=>{
+    s+=`<text x="${pL-6}" y="${pT+si*cH+cH/2+4}" text-anchor="end" fill="${T2}" font-size="10.5" font-family="Space Mono">${n}</text>`;
+    cats.forEach((_,ci)=>{
+      const v=data[si][ci];const col=v>=70?'255,45,85':v>=45?'255,159,10':'191,255,0';const op=.1+(v/100)*.65;
+      s+=`<rect x="${pL+ci*cW+3}" y="${pT+si*cH+3}" width="${cW-6}" height="${cH-6}" rx="4" fill="rgb(${col})" opacity="${op}"/>`;
+      s+=`<text x="${pL+ci*cW+cW/2}" y="${pT+si*cH+cH/2+5}" text-anchor="middle" fill="${v>=50?'#f0f4ff':T3}" font-size="11.5" font-family="Space Mono" font-weight="700">${v}</text>`;
+    });
+  });
+  el.innerHTML=s+'</svg>';
+}
+
+// ─── GOVERNANCE GRAPH ───
+function drawGovGraph(){
+  const el=document.getElementById('govGraph');if(!el||el.querySelector('svg'))return;
+  const W=el.offsetWidth||760,H=400;
+  const nodes=[
+    {x:.14,y:.28,l:'Credit v3',t:'ai',c:LM},{x:.14,y:.55,l:'HR Screen',t:'ai',c:LM},{x:.14,y:.8,l:'Fraud v7',t:'ai',c:LM},
+    {x:.34,y:.18,l:'Bias Risk',t:'risk',c:RE},{x:.34,y:.42,l:'Privacy',t:'risk',c:RE},{x:.34,y:.68,l:'Drift',t:'risk',c:RE},
+    {x:.54,y:.22,l:'Bias Ctrl',t:'ctrl',c:BL},{x:.54,y:.46,l:'DPIA',t:'ctrl',c:BL},{x:.54,y:.72,l:'Monitor',t:'ctrl',c:BL},
+    {x:.7,y:.3,l:'Bias Audit',t:'evid',c:GR},{x:.7,y:.62,l:'DPIA Rpt',t:'evid',c:GR},
+    {x:.86,y:.2,l:'EU AI Act',t:'fw',c:PU},{x:.86,y:.5,l:'NIST RMF',t:'fw',c:PU},{x:.86,y:.78,l:'ISO 42001',t:'fw',c:PU},
+  ];
+  const edges=[[0,3],[0,4],[1,3],[1,4],[2,5],[3,6],[4,7],[5,8],[6,9],[7,10],[9,11],[9,12],[10,11],[10,13],[8,12]];
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">`;
+  edges.forEach(([a,b])=>{const na=nodes[a],nb=nodes[b];s+=`<line x1="${na.x*W}" y1="${na.y*H}" x2="${nb.x*W}" y2="${nb.y*H}" stroke="rgba(191,255,0,.12)" stroke-width="1.2" stroke-dasharray="4,3"/>`;});
+  nodes.forEach(n=>{
+    s+=`<g transform="translate(${n.x*W},${n.y*H})">`;
+    s+=`<circle r="20" fill="${n.c}18" stroke="${n.c}" stroke-width="1.5"/>`;
+    const lines=n.l.split(' ');
+    lines.forEach((l,i)=>s+=`<text y="${(i-lines.length/2+.7)*11}" text-anchor="middle" fill="${n.c}" font-size="8.5" font-family="Space Mono">${l}</text>`);
+    s+=`</g>`;
+  });
+  s+=`<circle cx="${W*.98}" cy="14" r="4" fill="${LM}" opacity=".8"><animate attributeName="opacity" values=".8;.2;.8" dur="1.5s" repeatCount="indefinite"/></circle>`;
+  s+=`<text x="${W*.95}" y="18" text-anchor="end" fill="${LM}" font-size="8.5" font-family="Space Mono">LIVE</text>`;
+  el.innerHTML=s+'</svg>';
+}
+
+// ─── LINEAGE ───
+function drawLineage(){
+  const el=document.getElementById('lineageSvg');if(!el||el.querySelector('svg'))return;
+  const stages=[
+    {x:60,l:'Credit\nBureau\nAPI',c:BL,f:false},{x:185,l:'Transaction\nDatabase',c:BL,f:false},{x:310,l:'3rd Party\nEnrichment',c:RE,f:true},
+    {x:435,l:'Feature\nEngineering',c:AM,f:false},{x:545,l:'Credit\nModel v3',c:LM,f:false},{x:650,l:'Loan\nOfficer',c:GR,f:false},
+  ];
+  const W=710,H=160;
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="min-width:${W}px">`;
+  stages.forEach((a,i)=>{if(i<stages.length-1){const b=stages[i+1];s+=`<line x1="${a.x+28}" y1="${H/2}" x2="${b.x-28}" y2="${H/2}" stroke="rgba(191,255,0,.15)" stroke-width="1.5" stroke-dasharray="4,3"/>`;}});
+  stages.forEach(n=>{
+    s+=`<g transform="translate(${n.x},${H/2})">`;
+    if(n.f)s+=`<text y="-32" text-anchor="middle" fill="${RE}" font-size="13">⚠</text>`;
+    s+=`<circle r="26" fill="${n.c}18" stroke="${n.c}" stroke-width="1.5"/>`;
+    const ls=n.l.split('\n');ls.forEach((l,i)=>s+=`<text y="${(i-ls.length/2+.7)*11}" text-anchor="middle" fill="${n.c}" font-size="8.5" font-family="Space Mono">${l}</text>`);
+    s+=`</g>`;
+  });
+  el.innerHTML=s+'</svg>';
+}
+
+// ─── AGENTS CANVAS ───
+function drawAgents(){
+  const cv=document.getElementById('agentCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;
+  const W=cv.width,H=cv.height;
+  const agents=[
+    {x:W*.5,y:H*.5,l:'Governance\nCore',c:LM,r:30},{x:W*.2,y:H*.2,l:'Doc\nAgent',c:BL,r:21},
+    {x:W*.8,y:H*.2,l:'Proc\nAgent',c:AM,r:21},{x:W*.15,y:H*.75,l:'CX Bot',c:BL,r:20},
+    {x:W*.82,y:H*.72,l:'Risk\nMonitor',c:RE,r:20},{x:W*.5,y:H*.12,l:'Vendor\nAPI',c:PU,r:19},
+    {x:W*.32,y:H*.88,l:'⚠ Rogue',c:RE,r:17},
+  ];
+  const edges=[[0,1],[0,2],[0,3],[0,4],[0,5],[1,3]];
+  ctx.clearRect(0,0,W,H);
+  edges.forEach(([a,b])=>{
+    const na=agents[a],nb=agents[b];
+    ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
+    ctx.strokeStyle='rgba(191,255,0,.12)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  });
+  // Rogue
+  ctx.beginPath();ctx.moveTo(agents[0].x,agents[0].y);ctx.lineTo(agents[6].x,agents[6].y);
+  ctx.strokeStyle='rgba(255,45,85,.3)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
+  agents.forEach(a=>{
+    ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,Math.PI*2);ctx.fillStyle=a.c+'22';ctx.fill();
+    ctx.strokeStyle=a.c;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=a.c;ctx.font=`400 8.5px 'Space Mono'`;ctx.textAlign='center';
+    const ls=a.l.split('\n');ls.forEach((l,i)=>ctx.fillText(l,a.x,a.y+(i-ls.length/2+.7)*10));
+  });
+}
+
+// ─── WHY PANEL ───
+function tWhy(btn){
+  const p=btn.nextElementSibling;if(!p)return;
+  p.classList.toggle('open');btn.textContent=p.classList.contains('open')?'✕ CLOSE':'ⓘ WHY';
+}
+
+// ─── WIDGET DRAG ───
+let dragged=null;
+function dStart(e){dragged=e.currentTarget;e.currentTarget.classList.add('dragging');}
+function dOver(e){e.preventDefault();}
+function dDrop(e){
+  e.preventDefault();if(!dragged||dragged===e.currentTarget)return;
+  const g=document.getElementById('wGrid');const ch=[...g.children];
+  const di=ch.indexOf(dragged),ti=ch.indexOf(e.currentTarget);
+  if(di<ti)g.insertBefore(dragged,e.currentTarget.nextSibling);else g.insertBefore(dragged,e.currentTarget);
+  dragged.classList.remove('dragging');dragged=null;
+}
+document.addEventListener('dragend',()=>{dragged&&dragged.classList.remove('dragging');dragged=null;});
+
+// ─── AGENT BUILDER ───
+let abS=1;
+function abNext(){if(abS<6){document.getElementById('ab-s'+abS).style.display='none';abS++;document.getElementById('ab-s'+abS).style.display='block';upAb();}}
+function abPrev(){if(abS>1){document.getElementById('ab-s'+abS).style.display='none';abS--;document.getElementById('ab-s'+abS).style.display='block';upAb();}}
+function upAb(){
+  document.getElementById('ab-sd').textContent=abS;
+  document.querySelectorAll('.ab-step').forEach((s,i)=>{s.classList.remove('act','done');if(i+1===abS)s.classList.add('act');else if(i+1<abS)s.classList.add('done');});
+}
+function selTpl(c){document.querySelectorAll('.tpl-c').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');}
+function selVert(p){document.querySelectorAll('.trig[onclick="selVert(this)"],.trig-p .trig').forEach(x=>x.classList.remove('on'));p.classList.add('on');}
+function sTrig(p){document.querySelectorAll('.trig-p .trig').forEach(x=>x.classList.remove('on'));p.classList.add('on');}
+function sAuto(o){document.querySelectorAll('.auto-g .auto').forEach(x=>x.classList.remove('on'));o.classList.add('on');}
+function tProto(i){i.classList.toggle('on');const c=i.querySelector('.proto-chk');c.textContent=i.classList.contains('on')?'✓':'';}
+
+function deployAgent(){
+  document.querySelectorAll('.ab-body,.ab-steps').forEach(el=>el.style.display='none');
+  const rs=document.getElementById('ab-run');rs.classList.add('act');
+  const stages=['Initializing agent environment...','Connecting OpenAI & Anthropic APIs...','Loading EU AI Act + ECOA frameworks...','Building Bertrand-Mullainathan name panel...','Probing — White American names (Emily Wilson, Greg Johnson)...','Probing — Black American names (Lakisha Washington, Darnell Jackson)...','Probing — Hispanic American names (Sofia Martinez, Carlos Rodriguez)...','Probing — Asian American names (Mei Chen, Wei Zhang)...','Scoring demographic parity...','Computing disparate impact (EEOC 4/5 rule)...','Scoring alignment gap (Bembeneck et al., 2021)...','Quantifying monetary risk exposure...','Generating AI-powered remediation plan...','Filing evidence to library...','Creating Jira ticket BIAS-247...','Notifying #ai-governance on Slack...','Agent deployment complete. ✓'];
+  let i=0;
+  const addLog=txt=>{const l=document.getElementById('rl');l.innerHTML+=`<div class="lline"><span class="lts">[${new Date().toISOString().slice(11,19)}]</span> <span class="${txt.includes('✓')?'lok':txt.includes('⚠')?'lw':''}">${txt}</span></div>`;l.scrollTop=l.scrollHeight;};
+  const ti=setInterval(()=>{
+    if(i<stages.length){
+      const p=Math.round((i/stages.length)*100);
+      document.getElementById('rp').textContent=p+'%';document.getElementById('rf').style.width=p+'%';document.getElementById('rs').textContent=stages[i];
+      addLog(stages[i]);i++;
+    } else {
+      clearInterval(ti);document.getElementById('rp').textContent='100%';document.getElementById('rf').style.width='100%';
+      document.getElementById('rs').textContent='Complete — agent live';document.getElementById('rfin').style.display='block';
+    }
+  },750);
+}
+function runDemo(){nav('builder');abS=1;upAb();document.querySelectorAll('.ab-body').forEach((el,i)=>{el.style.display=i===0?'block':'none';});document.getElementById('ab-steps').style.display='flex';document.getElementById('ab-run').classList.remove('act');}
+
+// ─── AI ADVISOR (Live Claude API) ───
+const ADVISOR_SYSTEM = `You are Meridian's AI Governance Advisor — a senior expert in AI risk, compliance, and governance, grounded in the NIST AI Risk Management Framework and applicable regulatory requirements.
+
+NIST AI RMF FRAMEWORK (your primary analytical structure):
+- GOVERN: Organizational commitment, accountability structures, culture of risk management
+- MAP: Context recognition, risk identification, stakeholder impact assessment  
+- MEASURE: Risk assessment, testing, evaluation, verification, validation (TEVV)
+- MANAGE: Risk prioritization, controls, monitoring, incident response
+
+NIST TRUSTWORTHINESS CHARACTERISTICS (evaluate every AI system against all 7):
+1. Valid & Reliable — accuracy, robustness, generalizability
+2. Safe — no endangerment to life, health, property, environment
+3. Secure & Resilient — resistant to adversarial attacks, data poisoning, exfiltration
+4. Accountable & Transparent — audit trails, explainability, documentation
+5. Explainable & Interpretable — users can understand why decisions were made
+6. Privacy-Enhanced — anonymity, consent, data minimization
+7. Fair (Harmful Bias Managed) — systemic, computational, and human-cognitive bias addressed
+
+KEY LEGAL FRAMEWORKS:
+- EU AI Act: Risk-tiered (prohibited, high-risk Annex III, GPAI). High-risk requires Art.9 risk mgmt, Art.10 data governance, Art.14 human oversight. Fines up to 6% global revenue.
+- NYC Local Law 144: Annual independent bias audits required for automated employment decision tools
+- EEOC adverse impact doctrine: 4/5 (80%) rule for selection rates across protected groups
+- GDPR Art. 35: Data Protection Impact Assessments for high-risk processing
+- Houston Federation of Teachers v. HISD (2017): Algorithmic black boxes that cannot be independently verified may violate procedural due process when consequential decisions depend on them
+- Colorado AI Act, CA SB 53: State-level AI transparency requirements
+
+GOVERNANCE FAILURE MODES TO FLAG:
+- Objective function misspecification: model optimizes for proxy that diverges from actual goal (Stanford Hospital COVID vaccine algorithm; COMPAS recidivism)
+- Automation bias: users over-rely on AI outputs without scrutiny
+- Algorithm aversion: users distrust AI even when it outperforms humans
+- Sycophancy: models trained on user approval learn to tell users what they want to hear
+- Compliance washing: generating documentation without substantive organizational commitment
+- Shadow AI: 48.4% of employees use non-approved tools (Barndoor.ai 2026); 50% give AI persistent access to enterprise systems
+
+LIVE GOVERNANCE POSTURE:
+- 247 AI systems registered (31 shadow AI detected, ungoverned)
+- 18 open risk flags | $4.2M total monetary exposure
+- 3 active incidents: Credit Decisioning v3 (bias drift, SLA 6h, $1.9M), Customer Churn Model (data leak, $840K), Fraud Detection v7 (drift, $410K)
+- Compliance coverage: EU AI Act 88%, NIST RMF 94%, ISO 42001 79%, SOC 2 97%, GDPR 85%, HITRUST 52%
+- 38 active agents (6 shadow/ungoverned), 3 violations today
+
+IMPORTANT LIMITATION (disclose when relevant): You are an AI providing governance advice about AI systems — a recursive accountability problem. Your regulatory knowledge has a training cutoff and may confabulate specific citations. Treat outputs as expert guidance requiring human legal review, not legal advice. You maintain no audit trail of advice given. Organizations cannot challenge or verify your reasoning — the same property that courts found problematic in Houston Federation of Teachers v. HISD.
+
+Your role: Give direct, specific, actionable governance guidance. Speak as a peer to a Chief AI Officer. Quantify risks in dollars when possible. Cite specific regulatory articles. Be honest about uncertainty and tool limitations.`;
+
+let convHistory = [];
+
+function chkKey(v){
+  const st=document.getElementById('key-st');
+  if(v.startsWith('sk-ant-')&&v.length>20){st.textContent='✓ Live — real Claude responses active';st.style.color='var(--lime)';}
+  else if(v.length>0){st.textContent='Invalid format (should start sk-ant-)';st.style.color='var(--red)';}
+  else{st.textContent='Enter key to enable live responses';st.style.color='var(--t3)';}
+}
+
+async function askA(msg){
+  const el=document.getElementById('conv-msgs');
+  const key=document.getElementById('adv-key')?.value?.trim();
+  el.innerHTML+=`<div class="conv-msg user"><div class="conv-av user">MC</div><div class="conv-bub">${msg.replace(/</g,'&lt;')}</div></div>`;
+  const ty=document.createElement('div');ty.className='conv-msg';
+  ty.innerHTML=`<div class="conv-av bot">M</div><div class="conv-typing"><span></span><span></span><span></span></div>`;
+  el.appendChild(ty);el.scrollTop=el.scrollHeight;
+
+  if(!key||!key.startsWith('sk-ant-')){
+    setTimeout(()=>{
+      el.removeChild(ty);
+      el.innerHTML+=`<div class="conv-msg"><div class="conv-av bot">M</div><div class="conv-bub" style="border-color:rgba(255,159,10,.3)">⚠ Enter your Anthropic API key in the field above to get live Claude responses. Without it, the advisor cannot connect to the AI model.</div></div>`;
+      el.scrollTop=el.scrollHeight;
+    },400);
+    return;
+  }
+
+  // Add to conversation history
+  convHistory.push({role:'user',content:msg});
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1024,
+        system:window._patchedAdvisorSystem || ADVISOR_SYSTEM,
+        messages:convHistory
+      })
+    });
+
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message||'API error '+resp.status);
+    }
+
+    const data=await resp.json();
+    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+
+    // Store assistant response in history
+    convHistory.push({role:'assistant',content:text});
+    // Keep history bounded to last 10 turns (5 exchanges) to avoid token limits
+    if(convHistory.length>10) convHistory=convHistory.slice(-10);
+
+    el.removeChild(ty);
+    const formatted=text
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/`([^`]+)`/g,'<code style="font-family:var(--fm);font-size:10.5px;background:var(--s3);padding:1px 4px;border-radius:3px;color:var(--blu)">$1</code>')
+      .replace(/\n\n/g,'<br><br>')
+      .replace(/\n(\d+\.)/g,'<br>$1')
+      .replace(/\n-/g,'<br>•');
+    el.innerHTML+=`<div class="conv-msg"><div class="conv-av bot">M</div><div class="conv-bub">${formatted}</div></div>`;
+    el.scrollTop=el.scrollHeight;
+
+  } catch(err){
+    el.removeChild(ty);
+    el.innerHTML+=`<div class="conv-msg"><div class="conv-av bot">M</div><div class="conv-bub" style="border-color:rgba(255,45,85,.3)">⚠ Error: ${err.message}. Check your API key and try again.</div></div>`;
+    el.scrollTop=el.scrollHeight;
+    // Remove the failed user message from history
+    convHistory.pop();
+  }
+}
+function sendA(){const i=document.getElementById('conv-i');if(!i.value.trim())return;askA(i.value);i.value='';}
+
+// ─── ROI ───
+let roiChart=null;
+function calcROI(){
+  const b=+document.getElementById('s1').value,sys=+document.getElementById('s2').value,
+        h=+document.getElementById('s3').value,sal=+document.getElementById('s4').value,
+        inc=+document.getElementById('s5').value,ic=+document.getElementById('s6').value;
+  document.getElementById('s1v').textContent='$'+b+'M';document.getElementById('s2v').textContent=sys;
+  document.getElementById('s3v').textContent=h+' hrs';document.getElementById('s4v').textContent='$'+sal+'K';
+  document.getElementById('s5v').textContent=inc;document.getElementById('s6v').textContent='$'+ic+'K';
+  const hr=sal*1000/2080;
+  const ls3=Math.round(h*52*hr*.72*3),is3=Math.round(inc*ic*1000*.65*3),vs3=Math.round(sys*8000*.15*3);
+  const pc3=Math.max(180000,Math.round(sys*1400+90000))*3;
+  const net=ls3+is3+vs3-pc3,roi=Math.round(net/pc3*100);
+  document.getElementById('roi-pct').textContent=roi+'%';
+  document.getElementById('roi-sub').textContent='Est. 3-year net return · Payback ~'+Math.max(4,Math.round(36/(roi/100+1)))+' months';
+  document.getElementById('r1').textContent='+$'+(ls3/1000).toFixed(0)+'K';
+  document.getElementById('r2').textContent='+$'+(is3/1000).toFixed(0)+'K';
+  document.getElementById('r3').textContent='+$'+(vs3/1000).toFixed(0)+'K';
+  document.getElementById('r4').textContent='-$'+(pc3/1000).toFixed(0)+'K';
+  document.getElementById('r5').textContent=(net<0?'-':'+')+' $'+(Math.abs(net)/1000).toFixed(0)+'K';
+  const ctx=document.getElementById('roiChart');
+  if(roiChart)roiChart.destroy();
+  roiChart=new Chart(ctx,{type:'bar',data:{labels:['Labor','Incidents','Velocity','Platform'],datasets:[{data:[ls3/1000,is3/1000,vs3/1000,-(pc3/1000)],backgroundColor:[GR,LM,BL,RE],borderRadius:4,barThickness:24}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:T3,font:{size:9.5}}},y:{grid:{color:'rgba(191,255,0,.03)'},ticks:{color:T3,font:{family:"'Space Mono'",size:9},callback:v=>(v<0?'-':'')+'$'+Math.abs(Math.round(v))+'K'}}}}});
+}
+
+// ─── CMD PALETTE ───
+const CIs=[
+  {i:'▣',l:'Dashboard',s:'Command',fn:()=>nav('dashboard')},{i:'◫',l:'AI Registry',s:'Command',fn:()=>nav('registry')},
+  {i:'◉',l:'Agent Monitor',s:'Command',fn:()=>nav('agents')},{i:'◈',l:'Risk Intelligence',s:'Command',fn:()=>nav('risk')},
+  {i:'✦',l:'Agent Builder',s:'Build',fn:()=>nav('builder')},{i:'⊞',l:'Agent Library',s:'Build',fn:()=>nav('library')},
+  {i:'◧',l:'Policy Engine',s:'Build',fn:()=>nav('policy')},{i:'◐',l:'AI Advisor',s:'Intelligence',fn:()=>nav('advisor')},
+  {i:'⬡',l:'Governance Graph',s:'Intelligence',fn:()=>nav('graph')},{i:'⊕',l:'Bias Audits',s:'Intelligence',fn:()=>nav('bias')},
+  {i:'⇢',l:'Data Lineage',s:'Intelligence',fn:()=>nav('lineage')},{i:'⚡',l:'Incidents',s:'Compliance',fn:()=>nav('incidents')},
+  {i:'◱',l:'Evidence Library',s:'Compliance',fn:()=>nav('evidence')},{i:'☁',l:'Vendor Portal',s:'Compliance',fn:()=>nav('vendors')},
+  {i:'⚖',l:'Regulatory Tracker',s:'Compliance',fn:()=>nav('regs')},{i:'⬡',l:'Integration Hub',s:'Extended',fn:()=>nav('integrations')},
+  {i:'⊟',l:'Audit Trail',s:'Extended',fn:()=>nav('audit')},{i:'▤',l:'ROI Calculator',s:'Extended',fn:()=>nav('roi')},
+  {i:'▥',l:'Maturity Score',s:'Extended',fn:()=>nav('maturity')},
+];
+function openCmd(){document.getElementById('cmdOv').classList.add('open');rCmd('');setTimeout(()=>document.getElementById('cmdI').focus(),50);}
+function closeCmd(){document.getElementById('cmdOv').classList.remove('open');document.getElementById('cmdI').value='';}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}if(e.key==='Escape')closeCmd();});
+function fCmd(q){rCmd(q);}
+function rCmd(q){
+  const f=q?CIs.filter(c=>c.l.toLowerCase().includes(q.toLowerCase())):CIs;
+  const secs=[...new Set(f.map(c=>c.s))];
+  let h='';
+  secs.forEach(sec=>{h+=`<div class="cmd-sl">${sec}</div>`;f.filter(c=>c.s===sec).forEach(c=>h+=`<div class="cmd-it" onclick="(${c.fn.toString()})()">${'<span class="cmd-it-i">'+c.i+'</span>'}${c.l}<span class="cmd-it-s">${c.s}</span></div>`);});
+  document.getElementById('cmdR').innerHTML=h||'<div style="padding:14px;text-align:center;color:var(--t3);font-size:12px">No results</div>';
+}
+
+// ── ENTERPRISE ONBOARDING ──────────────────────────────────────────────────
+const OB_STEPS = [
+  {
+    label: 'Step 1 of 4',
+    title: 'Welcome to Meridian',
+    sub: "Let's configure your governance workspace. Four quick questions — takes under a minute.",
+    field: 'size',
+    question: 'How large is your organization?',
+    opts: [
+      { val: 'smb', name: '1 – 500 employees', sub: 'SMB / growth-stage' },
+      { val: 'mid', name: '500 – 5,000', sub: 'Mid-market' },
+      { val: 'ent', name: '5,000 – 50,000', sub: 'Enterprise' },
+      { val: 'f500', name: '50,000+', sub: 'Fortune 500 / global' },
+    ],
+    layout: 'two'
+  },
+  {
+    label: 'Step 2 of 4',
+    title: 'Industry',
+    sub: 'Meridian applies sector-specific regulations, fairness frameworks, and risk benchmarks based on your vertical.',
+    field: 'industry',
+    question: 'Primary industry',
+    opts: [
+      { val: 'fin',   name: 'Financial Services', sub: 'ECOA, Fair Housing, CFPB' },
+      { val: 'hc',    name: 'Healthcare', sub: 'ACA §1557, HIPAA, FDA' },
+      { val: 'tech',  name: 'Technology', sub: 'EU AI Act, GDPR' },
+      { val: 'hr',    name: 'HR & Staffing', sub: 'Title VII, EEOC, NYC LL 144' },
+      { val: 'gov',   name: 'Government', sub: 'Due Process, 14th Amendment' },
+      { val: 'other', name: 'Other / General', sub: 'NIST RMF, ISO 42001' },
+    ],
+    layout: 'three'
+  },
+  {
+    label: 'Step 3 of 4',
+    title: 'AI use cases',
+    sub: 'Select all that apply. This determines which risk categories and regulatory obligations appear in your dashboard.',
+    field: 'uses',
+    question: 'How is your organization using AI?',
+    multi: true,
+    opts: [
+      { val: 'credit',   name: 'Credit & lending decisions', sub: 'ECOA, CFPB, Fair Housing' },
+      { val: 'hiring',   name: 'Hiring & recruitment', sub: 'Title VII, NYC LL 144, EEOC' },
+      { val: 'clinical', name: 'Clinical / healthcare', sub: 'ACA §1557, 14th Amendment' },
+      { val: 'cx',       name: 'Customer service & chatbots', sub: 'GDPR, CCPA' },
+      { val: 'genai',    name: 'Generative AI / content', sub: 'EU AI Act Art. 52, copyright' },
+      { val: 'fraud',    name: 'Fraud & risk detection', sub: 'PCI, SOX, AML' },
+    ],
+    layout: 'two'
+  },
+  {
+    label: 'Step 4 of 4',
+    title: 'Governance maturity',
+    sub: 'Your honest assessment. This calibrates default risk thresholds, widget prominence, and advisor guidance.',
+    field: 'maturity',
+    question: 'Where is your AI governance program today?',
+    opts: [
+      { val: '1', name: 'Just starting', sub: 'No formal program, no dedicated function' },
+      { val: '2', name: 'Early stage', sub: 'Some policies documented, no enforcement' },
+      { val: '3', name: 'Established', sub: 'Dedicated function, regular reviews' },
+      { val: '4', name: 'Advanced', sub: 'Continuous monitoring, metrics-driven' },
+    ],
+    layout: 'two'
+  }
+];
+
+const obProfile = { size: null, industry: null, uses: [], maturity: null };
+let obStep = 0;
+
+function obInit() {
+  // Check if already configured
+  try {
+    const saved = localStorage.getItem('meridian_ob_done');
+    if (saved === 'true') { document.getElementById('obOverlay').classList.add('hide'); return; }
+  } catch(e) {}
+  obRender();
+}
+
+function obRender() {
+  const step = OB_STEPS[obStep];
+  // Update step bar
+  for (let i = 0; i < 4; i++) {
+    const seg = document.getElementById('obSeg' + i);
+    if (!seg) continue;
+    seg.classList.remove('done', 'act');
+    if (i < obStep) seg.classList.add('done');
+    else if (i === obStep) seg.classList.add('act');
+  }
+
+  const optsHTML = step.opts.map(o => {
+    const selected = step.multi
+      ? obProfile.uses.includes(o.val)
+      : obProfile[step.field] === o.val;
+    return `<div class="ob-opt${selected ? ' on' : ''}" onclick="obSelect('${o.val}', ${step.multi || false})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="ob-opt-name">${o.name}</div>
+          <div class="ob-opt-sub">${o.sub}</div>
+        </div>
+        <div class="ob-opt-check">✓</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const canProgress = step.multi
+    ? obProfile.uses.length > 0
+    : obProfile[step.field] !== null;
+
+  document.getElementById('obContent').innerHTML = `
+    <div class="ob-label">${step.label}</div>
+    <div class="ob-title">${step.title}</div>
+    <div class="ob-sub">${step.sub}</div>
+    <div class="ob-label" style="margin-bottom:10px">${step.question}</div>
+    <div class="ob-opts ${step.layout}">${optsHTML}</div>
+    <div class="ob-nav">
+      ${obStep > 0 ? '<button class="ob-btn-s" onclick="obBack()">← Back</button>' : '<span></span>'}
+      <span class="ob-skip" onclick="obSkip()">Skip setup</span>
+      <button class="ob-btn-p" onclick="obNext()" ${canProgress ? '' : 'disabled style="opacity:.45;cursor:not-allowed"'}>
+        ${obStep < 3 ? 'Next →' : 'Configure workspace →'}
+      </button>
+    </div>`;
+}
+
+function obSelect(val, multi) {
+  const step = OB_STEPS[obStep];
+  if (multi) {
+    const idx = obProfile.uses.indexOf(val);
+    if (idx >= 0) obProfile.uses.splice(idx, 1);
+    else obProfile.uses.push(val);
+  } else {
+    obProfile[step.field] = val;
+  }
+  obRender();
+}
+
+function obNext() {
+  if (obStep < 3) { obStep++; obRender(); }
+  else { obConfigure(); }
+}
+
+function obBack() {
+  if (obStep > 0) { obStep--; obRender(); }
+}
+
+function obSkip() {
+  document.getElementById('obOverlay').classList.add('hide');
+  try { localStorage.setItem('meridian_ob_done', 'true'); } catch(e) {}
+}
+
+function obConfigure() {
+  // Show spinner
+  document.getElementById('obContent').innerHTML = `
+    <div class="ob-configuring">
+      <div class="ob-cfg-spinner"></div>
+      <div class="ob-cfg-title">Configuring your workspace</div>
+      <div class="ob-cfg-steps">
+        Applying ${OB_INDUSTRIES[obProfile.industry] || 'enterprise'} frameworks...<br>
+        Loading ${obProfile.uses.length} use-case risk models...<br>
+        Setting maturity-level thresholds...<br>
+        Personalizing AI Advisor context...
+      </div>
+    </div>`;
+  setTimeout(() => { obApply(); }, 1800);
+}
+
+const OB_INDUSTRIES = {
+  fin: 'Financial Services', hc: 'Healthcare', tech: 'Technology',
+  hr: 'HR & Staffing', gov: 'Government', other: 'General Enterprise'
+};
+
+function obApply() {
+  const p = obProfile;
+  const ind = OB_INDUSTRIES[p.industry] || 'Enterprise';
+
+  // 1. Update the sidebar org name display
+  const uname = document.querySelector('.sb-uname');
+  if (uname && p.size) {
+    const sizeLabel = {smb:'SMB',mid:'Mid-Market',ent:'Enterprise',f500:'Fortune 500'}[p.size] || '';
+    uname.textContent = `${ind} Org`;
+  }
+  const urole = document.querySelector('.sb-urole');
+  if (urole) {
+    const matLabel = {1:'Building Governance',2:'Early Governance',3:'Established Gov.',4:'Advanced Gov.'}[p.maturity] || 'Chief AI Officer';
+    urole.textContent = matLabel;
+  }
+
+  // 2. Update the predictive card based on industry
+  const predCard = document.querySelector('.pred');
+  if (predCard) {
+    const predContent = {
+      fin: {
+        title: 'Credit Decisioning v3 — bias drift will breach SLA in <span id="pred-sla" style="color:var(--red);font-weight:600">5h 59m 57s</span>',
+        desc: 'Demographic parity gap trending +0.8pp/h over 4h. EU AI Act Art.9 + ECOA threshold breach projected. 3 similar incidents resolved in &lt;2h when addressed early. <strong>$1.9M monetary exposure.</strong>',
+        btn: '✦ Deploy Bias Auditor'
+      },
+      hc: {
+        title: 'Triage AI — racial disparity in pain assessment flagged',
+        desc: 'Alignment gap between white and Black patient triage scores reached 0.8 points — approaching ACA §1557 threshold. Pattern consistent with Obermeyer et al. (2019) algorithm bias findings.',
+        btn: '✦ Run Demographic Audit'
+      },
+      hr: {
+        title: 'Resume Screener — NYC Local Law 144 audit overdue by 47 days',
+        desc: 'Annual bias audit required for automated employment decision tools under NYC LL 144. Legal exposure active. EEOC 4/5 adverse impact test has not been run since deployment.',
+        btn: '✦ Deploy LL 144 Auditor'
+      },
+      gov: {
+        title: 'Recidivism Model — demographic disparity detected',
+        desc: 'False positive rate for minority defendants is 1.8× the rate for non-minority defendants — consistent with COMPAS audit findings (ProPublica, 2016). Due Process concerns active.',
+        btn: '✦ Run Equity Audit'
+      },
+    };
+    const pc = predContent[p.industry] || predContent.fin;
+    const titleEl = predCard.querySelector('.pred-t');
+    const descEl = predCard.querySelector('.pred-d');
+    const btnEl = predCard.querySelector('.pred-a.p');
+    if (titleEl) titleEl.textContent = pc.title;
+    if (descEl) descEl.innerHTML = pc.desc;
+    if (btnEl) btnEl.textContent = pc.btn;
+  }
+
+  // 3. Update the AI Advisor system prompt to include profile
+  window._obProfile = p;
+  const origSystem = ADVISOR_SYSTEM;
+  window.ADVISOR_SYSTEM_BASE = origSystem;
+  // Override ADVISOR_SYSTEM with profile context injected
+  const profileNote = `
+ORGANIZATION PROFILE (from onboarding):
+- Size: ${({smb:'SMB (<500)',mid:'Mid-market (500–5k)',ent:'Enterprise (5–50k)',f500:'Fortune 500 (50k+)'})[p.size] || 'Enterprise'}
+- Industry: ${ind}
+- AI Use Cases: ${p.uses.map(u=>({credit:'Credit/lending',hiring:'Hiring/recruitment',clinical:'Healthcare/clinical',cx:'Customer service',genai:'Generative AI',fraud:'Fraud detection'})[u]||u).join(', ') || 'General enterprise AI'}
+- Governance Maturity Level: ${p.maturity || 2} of 4 (${({1:'Ad hoc',2:'Defined',3:'Managed',4:'Optimizing'})[p.maturity]||'Defined'})
+
+Tailor your advice specifically to this profile. For Financial Services: emphasize ECOA, Fair Housing Act, CFPB. For Healthcare: emphasize ACA §1557, HIPAA. For HR: emphasize Title VII, EEOC, NYC LL 144. For lower maturity orgs (1-2): prioritize foundational steps, be prescriptive. For higher maturity (3-4): assume baseline knowledge, focus on optimization and edge cases.`;
+
+  // Patch ADVISOR_SYSTEM at runtime
+  try {
+    // Reconstruct it with the profile injected after the posture section
+    const systemLines = ADVISOR_SYSTEM.split('Your role:');
+    if (systemLines.length === 2) {
+      window._patchedAdvisorSystem = systemLines[0] + profileNote + '\n\nYour role:' + systemLines[1];
+    }
+  } catch(e) {}
+
+  // 4. Update the topbar title
+  const tbTitle = document.getElementById('tb-title');
+  if (tbTitle) tbTitle.textContent = 'Overview — ' + ind;
+
+  // 5. Highlight relevant sidebar items based on uses
+  if (p.uses.includes('hiring') || p.uses.includes('credit')) {
+    const biasNi = document.querySelector("[onclick=\"nav('bias')\"]");
+    if (biasNi) biasNi.style.borderLeft = '2px solid var(--lime)';
+  }
+
+  // 6. Save and dismiss
+  try { localStorage.setItem('meridian_ob_done', 'true'); } catch(e) {}
+  document.getElementById('obOverlay').classList.add('hide');
+}
+
+// Init onboarding on load
+window.addEventListener('load', () => setTimeout(obInit, 400));
+
+
+// ════════════════════════════════════════════════════════════
+//  MERIDIAN LIVE SYSTEMS — real-time updates across platform
+// ════════════════════════════════════════════════════════════
+
+const LIVE = {
+  // Counters
+  agentActions: { 4201: 4201, 6041: 6041, 892: 892 },
+  jiraTickets: 14,
+  azureUsers: 1240,
+  claudeLogs: 2841,
+  slackMsgs: 47,
+  shadowFound: 2,
+  incidentsOpen: 3,
+  systemsCount: 247,
+  flagsCount: 18,
+  shadowCount: 31,
+
+  // SLA start time (ms from page load)
+  slaLoadTime: Date.now(),
+  // SLA durations — 6h, 8h, 72h
+  slaDurations: [6*3600000, 8*3600000, 72*3600000],
+
+  // Live feed pool
+  feedPool: [
+    { icon:'⚠', bg:'var(--red-d)', col:'var(--red)',  title:'Bias velocity increasing — Credit v3 drift +0.9pp/h', sub:'Risk Intelligence' },
+    { icon:'✓', bg:'var(--lime-d)', col:'var(--lime)', title:'Evidence auto-collected — ISO 42001 §9.1.3', sub:'Evidence Library' },
+    { icon:'+', bg:'var(--blu-d)',  col:'var(--blu)',  title:'Shadow API detected — ungoverned agent candidate', sub:'Shadow AI Monitor' },
+    { icon:'⬡', bg:'var(--amb-d)', col:'var(--amb)',  title:'Policy pack synced — EU AI Act Art.10 v2.3', sub:'Policy Engine' },
+    { icon:'●', bg:'var(--pur-d)', col:'var(--pur)',  title:'Vendor assessment due — OpenAI contract renewal 14d', sub:'Vendor Portal' },
+    { icon:'⛔',bg:'var(--red-d)', col:'var(--red)',  title:'Agent action blocked — Procurement Bot spend limit', sub:'Agent Monitor' },
+    { icon:'✓', bg:'var(--lime-d)', col:'var(--lime)', title:'NIST GOVERN-1.1 controls mapped — 8 systems', sub:'Policy Engine' },
+    { icon:'🔍',bg:'var(--blu-d)',  col:'var(--blu)',  title:'Bias scan complete — HR Screener passed this cycle', sub:'Bias Audits' },
+    { icon:'⚡',bg:'var(--amb-d)', col:'var(--amb)',  title:'Incident SLA warning — Data Leak Model entering orange', sub:'Incident Response' },
+    { icon:'✓', bg:'var(--lime-d)', col:'var(--lime)', title:'Maturity score recalculated — 82/100 (+1)', sub:'Maturity Score' },
+    { icon:'+', bg:'var(--blu-d)',  col:'var(--blu)',  title:'Azure AD sync completed — 3 new identities governed', sub:'Integration Hub' },
+    { icon:'⬡', bg:'var(--pur-d)', col:'var(--pur)',  title:'HITRUST gap analysis updated — 52% coverage', sub:'Risk Intelligence' },
+  ],
+  feedIdx: 0,
+  feedIntervalAge: 0,  // seconds since last feed update
+
+  intervals: [],
+};
+
+// ── HELPERS ──────────────────────────────────────────────────
+
+function fmt(ms) {
+  if (ms <= 0) return '<span style="color:var(--red);font-weight:700">BREACHED</span>';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (h > 48) {
+    const d = Math.floor(h/24), rh = h%24;
+    return `${d}d ${rh}h ${String(m).padStart(2,'0')}m`;
+  }
+  if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+  return `${m}m ${String(s).padStart(2,'0')}s`;
+}
+
+function setEl(id, val, flash) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = val;
+  if (flash) {
+    el.style.transition = 'color 0.3s';
+    el.style.color = flash;
+    setTimeout(() => el.style.color = '', 700);
+  }
+}
+
+function numEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return parseInt(el.textContent.replace(/[^0-9]/g, '')) || 0;
+}
+
+// ── 1. TOPBAR CLOCK (1s) ────────────────────────────────────
+
+function updateClock() {
+  const el = document.getElementById('live-clock');
+  if (!el) return;
+  const n = new Date();
+  const h = String(n.getUTCHours()).padStart(2,'0');
+  const m = String(n.getUTCMinutes()).padStart(2,'0');
+  const s = String(n.getUTCSeconds()).padStart(2,'0');
+  el.textContent = `${h}:${m}:${s} UTC`;
+}
+
+// ── 2. SLA COUNTDOWNS (1s) ──────────────────────────────────
+
+function updateSLAs() {
+  const elapsed = Date.now() - LIVE.slaLoadTime;
+  const ids = ['sla-0','sla-1','sla-2'];
+  const dashes = ['dash-sla-badge','pred-sla'];
+
+  ids.forEach((id, i) => {
+    const rem = LIVE.slaDurations[i] - elapsed;
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = fmt(rem);
+    const pct = rem / LIVE.slaDurations[i];
+    if (pct < 0.1) { el.style.color = 'var(--red)'; el.style.fontWeight = '700'; }
+    else if (pct < 0.25) el.style.color = 'var(--amb)';
+  });
+
+  // Predictive card + dash badge both show primary SLA
+  const rem0 = LIVE.slaDurations[0] - elapsed;
+  dashes.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = fmt(rem0);
+    const pct = rem0 / LIVE.slaDurations[0];
+    if (pct < 0.1) el.style.color = 'var(--red)';
+    else if (pct < 0.25) el.style.color = 'var(--amb)';
+  });
+}
+
+// ── 3. AGENT ACTION TICKERS (3s) ────────────────────────────
+
+function tickAgents() {
+  // Tick all cells with data-agent-actions
+  document.querySelectorAll('[data-agent-actions]').forEach(el => {
+    const cur = parseInt(el.dataset.agentActions) || 0;
+    const delta = Math.floor(Math.random() * 9) + 1;
+    const next = cur + delta;
+    el.dataset.agentActions = next;
+    el.textContent = next.toLocaleString();
+    el.style.transition = 'color 0.4s';
+    el.style.color = 'var(--lime)';
+    setTimeout(() => el.style.color = '', 600);
+  });
+
+  // Tick the KPI
+  const kpi = document.getElementById('agent-actions-kpi');
+  if (kpi) {
+    const cur = parseInt(kpi.textContent.replace(/,/g,'')) || 12847;
+    const next = cur + Math.floor(Math.random()*18)+3;
+    kpi.textContent = next.toLocaleString();
+  }
+
+  // Occasionally change DNA score on a row
+  const dnaScores = document.querySelectorAll('[data-dna-score]');
+  if (dnaScores.length && Math.random() < 0.3) {
+    const el = dnaScores[Math.floor(Math.random()*dnaScores.length)];
+    const cur = parseFloat(el.dataset.dnaScore) || 0.72;
+    const next = Math.round((cur + (Math.random()-.5)*0.04)*100)/100;
+    el.dataset.dnaScore = next;
+    const capped = Math.min(1, Math.max(0, next));
+    const col = capped > 0.8 ? 'var(--red)' : capped > 0.6 ? 'var(--amb)' : 'var(--t2)';
+    el.innerHTML = `JS=<span style="color:${col}">${capped.toFixed(2)}</span>`;
+  }
+}
+
+// ── 4. LIVE ACTIVITY FEED (20s) ─────────────────────────────
+
+function addFeedItem() {
+  const feed = document.getElementById('live-feed');
+  if (!feed) return;
+
+  // Age up existing timestamps
+  feed.querySelectorAll('[data-age]').forEach(ts => {
+    const cur = parseInt(ts.dataset.age) || 0;
+    const next = cur + 1;
+    ts.dataset.age = next;
+    if (next < 60) ts.textContent = next + 'm ago';
+    else if (next < 1440) ts.textContent = Math.floor(next/60) + 'h ago';
+    else ts.textContent = Math.floor(next/1440) + 'd ago';
+  });
+
+  // Add new item
+  const item = LIVE.feedPool[LIVE.feedIdx % LIVE.feedPool.length];
+  LIVE.feedIdx++;
+
+  const div = document.createElement('div');
+  div.className = 'tt-row';
+  div.style.cssText = 'opacity:0;transform:translateY(-6px);transition:all 0.35s ease';
+  div.innerHTML = `
+    <span class="tt-ts" data-age="0" style="color:var(--lime);font-family:var(--fm);font-size:9.5px">just now</span>
+    <div class="tt-ico" style="background:${item.bg};color:${item.col};width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">${item.icon}</div>
+    <div><div class="tt-t" style="font-size:12.5px;color:var(--t1)">${item.title}</div><div class="tt-s" style="font-size:11px;color:var(--t2)">${item.sub}</div></div>
+  `;
+
+  // Remove oldest if > 5
+  const rows = feed.querySelectorAll('.tt-row');
+  if (rows.length >= 5) rows[rows.length-1].remove();
+
+  feed.insertBefore(div, feed.firstChild);
+  requestAnimationFrame(() => {
+    div.style.opacity = '1';
+    div.style.transform = 'translateY(0)';
+  });
+}
+
+// ── 5. KPI DRIFT (8s) ───────────────────────────────────────
+
+function driftKPIs() {
+  // Flags ±1 occasionally
+  if (Math.random() < 0.3) {
+    LIVE.flagsCount = Math.max(14, Math.min(25, LIVE.flagsCount + (Math.random()<0.55?1:-1)));
+    const el = document.getElementById('flags-kpi');
+    if (el) {
+      const prev = numEl('flags-kpi');
+      el.textContent = LIVE.flagsCount;
+      el.style.color = LIVE.flagsCount > prev ? 'var(--red)' : '#30d158';
+      setTimeout(() => el.style.color = '', 900);
+    }
+  }
+
+  // Shadow count occasionally +1
+  if (Math.random() < 0.12) {
+    LIVE.shadowCount++;
+    const el = document.getElementById('shadow-kpi');
+    if (el) {
+      el.textContent = LIVE.shadowCount;
+      el.style.color = 'var(--amb)';
+      setTimeout(() => el.style.color = '', 900);
+    }
+    const sf = document.getElementById('shadow-found');
+    if (sf) {
+      LIVE.shadowFound++;
+      sf.textContent = LIVE.shadowFound;
+    }
+  }
+}
+
+// ── 6. INTEGRATION LIVE COUNTERS (7s) ───────────────────────
+
+function updateIntegrations() {
+  // Claude logs growing
+  LIVE.claudeLogs += Math.floor(Math.random()*12)+2;
+  setEl('claude-log-count', LIVE.claudeLogs.toLocaleString());
+
+  // Slack messages growing
+  if (Math.random() < 0.4) {
+    LIVE.slackMsgs += 1;
+    setEl('slack-msgs', LIVE.slackMsgs);
+  }
+
+  // Jira tickets occasionally changes
+  if (Math.random() < 0.15) {
+    LIVE.jiraTickets += Math.random() < 0.6 ? 1 : -1;
+    LIVE.jiraTickets = Math.max(10, LIVE.jiraTickets);
+    setEl('jira-tickets', LIVE.jiraTickets);
+  }
+
+  // Azure users +1 occasionally
+  if (Math.random() < 0.08) {
+    LIVE.azureUsers += 1;
+    setEl('azure-users', LIVE.azureUsers.toLocaleString());
+  }
+
+  // Age up sync timestamps
+  document.querySelectorAll('[data-sync-mins]').forEach(el => {
+    const mins = parseInt(el.dataset.syncMins || '0');
+    if (mins === 0) return; // Live connection, don't age
+    const next = mins + 1;
+    el.dataset.syncMins = next;
+    if (next < 60) el.textContent = `Synced ${next}m ago`;
+    else el.textContent = `Synced ${Math.floor(next/60)}h ago`;
+  });
+}
+
+// ── 7. TREND CHART LIVE UPDATE (25s) ────────────────────────
+
+let _trendChart = null;
+function liveTrendUpdate() {
+  if (!_trendChart) {
+    try { _trendChart = Chart.getChart('trendChart'); } catch(e) {}
+  }
+  if (!_trendChart) return;
+  const ds0 = _trendChart.data.datasets[0]; // compliance %
+  const ds1 = _trendChart.data.datasets[1]; // risk flags
+  const last0 = ds0.data[ds0.data.length-1];
+  const last1 = ds1.data[ds1.data.length-1];
+  // Tiny realistic drift
+  ds0.data[ds0.data.length-1] = Math.min(99, Math.max(85, last0 + (Math.random()-.35)*0.4));
+  ds1.data[ds1.data.length-1] = Math.max(8, Math.min(22, last1 + (Math.random()-.45)*0.6));
+  _trendChart.update('none');
+}
+
+// ── 8. AGENT CANVAS — floating nodes (continuous) ───────────
+
+let _agentNodes = null;
+let _agentRaf = null;
+
+function startAgentCanvas() {
+  const cv = document.getElementById('agentCanvas');
+  if (!cv || _agentNodes) return;
+  const ctx2 = cv.getContext('2d');
+  const resize = () => { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight || 360; };
+  resize();
+  window.addEventListener('resize', resize);
+
+  const W = () => cv.width, H = () => cv.height;
+
+  _agentNodes = [
+    {x:.5,  y:.5,  vx:0,   vy:0,   l:'Governance\nCore', c:'#bfff00', r:30, fixed:true},
+    {x:.2,  y:.22, vx:.22, vy:.14, l:'Doc\nAgent',       c:'#0a84ff', r:20},
+    {x:.8,  y:.2,  vx:-.16,vy:.18, l:'Procurement',      c:'#ff9f0a', r:20},
+    {x:.16, y:.74, vx:.22, vy:-.12,l:'CX Bot',           c:'#0a84ff', r:20},
+    {x:.82, y:.72, vx:-.18,vy:-.15,l:'Risk\nMonitor',    c:'#ff2d55', r:20},
+    {x:.5,  y:.12, vx:.1,  vy:.22, l:'Vendor\nAPI',      c:'#bf5af2', r:18},
+    {x:.32, y:.88, vx:.18, vy:-.2, l:'⚠ Shadow',         c:'#ff2d55', r:16},
+  ];
+  const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[1,3]];
+  const rogueEdge = [0,6];
+  let phase = 0;
+  const packets = [];
+
+  function spawnPacket(a, b) {
+    packets.push({ a, b, t: 0, speed: 0.008 + Math.random()*0.006 });
+  }
+
+  function draw() {
+    const w = W(), h = H();
+    ctx2.clearRect(0, 0, w, h);
+    phase += 0.018;
+
+    // Move nodes
+    _agentNodes.forEach((n, i) => {
+      if (n.fixed) return;
+      n.x += n.vx/w*2.2;
+      n.y += n.vy/h*2.2;
+      const pad = n.r/w + 0.04;
+      if (n.x < pad || n.x > 1-pad) { n.vx *= -1; n.x = Math.max(pad, Math.min(1-pad, n.x)); }
+      if (n.y < pad || n.y > 1-pad) { n.vy *= -1; n.y = Math.max(pad, Math.min(1-pad, n.y)); }
+      // Gentle centering pull for non-rogue
+      if (i !== 6) {
+        const dx = 0.5-n.x, dy = 0.5-n.y, dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist > 0.42) { n.vx += dx*0.004; n.vy += dy*0.004; }
+      }
+      // Speed cap
+      const sp = Math.sqrt(n.vx*n.vx+n.vy*n.vy);
+      if (sp > 0.5) { n.vx *= 0.5/sp; n.vy *= 0.5/sp; }
+    });
+
+    // Spawn packets occasionally
+    if (Math.random() < 0.04) {
+      const e = edges[Math.floor(Math.random()*edges.length)];
+      spawnPacket(e[0], e[1]);
+    }
+
+    // Draw edges
+    edges.forEach(([a,b]) => {
+      const na=_agentNodes[a], nb=_agentNodes[b];
+      const alpha = 0.09 + Math.sin(phase)*0.03;
+      ctx2.beginPath();
+      ctx2.moveTo(na.x*w, na.y*h);
+      ctx2.lineTo(nb.x*w, nb.y*h);
+      ctx2.strokeStyle = `rgba(191,255,0,${alpha})`;
+      ctx2.lineWidth = 1.2;
+      ctx2.setLineDash([4,4]);
+      ctx2.stroke();
+      ctx2.setLineDash([]);
+    });
+    // Rogue edge
+    const rna=_agentNodes[rogueEdge[0]], rnb=_agentNodes[rogueEdge[1]];
+    const ralpha = 0.18 + Math.sin(phase*2.5)*0.08;
+    ctx2.beginPath();
+    ctx2.moveTo(rna.x*w, rna.y*h);
+    ctx2.lineTo(rnb.x*w, rnb.y*h);
+    ctx2.strokeStyle = `rgba(255,45,85,${ralpha})`;
+    ctx2.lineWidth = 1.5;
+    ctx2.setLineDash([5,4]);
+    ctx2.stroke();
+    ctx2.setLineDash([]);
+
+    // Draw packets
+    for (let i = packets.length-1; i >= 0; i--) {
+      const pk = packets[i];
+      pk.t += pk.speed;
+      if (pk.t >= 1) { packets.splice(i,1); continue; }
+      const na=_agentNodes[pk.a], nb=_agentNodes[pk.b];
+      const px = (na.x + (nb.x-na.x)*pk.t)*w;
+      const py = (na.y + (nb.y-na.y)*pk.t)*h;
+      ctx2.beginPath();
+      ctx2.arc(px, py, 3, 0, Math.PI*2);
+      ctx2.fillStyle = 'rgba(191,255,0,0.85)';
+      ctx2.fill();
+    }
+
+    // Draw nodes
+    _agentNodes.forEach((n, i) => {
+      const pulse = n.fixed ? 1 + Math.sin(phase*1.4)*0.05 : 1;
+      const r = n.r * pulse;
+      const nx = n.x*w, ny = n.y*h;
+
+      // Glow
+      const g = ctx2.createRadialGradient(nx, ny, r*.2, nx, ny, r*2.2);
+      g.addColorStop(0, n.c+'33');
+      g.addColorStop(1, 'transparent');
+      ctx2.beginPath();
+      ctx2.arc(nx, ny, r*2.2, 0, Math.PI*2);
+      ctx2.fillStyle = g;
+      ctx2.fill();
+
+      // Circle fill + stroke
+      ctx2.beginPath();
+      ctx2.arc(nx, ny, r, 0, Math.PI*2);
+      ctx2.fillStyle = n.c+'18';
+      ctx2.fill();
+      ctx2.strokeStyle = n.c;
+      ctx2.lineWidth = 1.5;
+      if (i === 6) ctx2.setLineDash([4,3]);
+      ctx2.stroke();
+      ctx2.setLineDash([]);
+
+      // Label
+      ctx2.fillStyle = n.c;
+      ctx2.font = `400 8.5px 'Space Mono', monospace`;
+      ctx2.textAlign = 'center';
+      const lines = n.l.split('\n');
+      lines.forEach((ln, li) => ctx2.fillText(ln, nx, ny + (li-(lines.length-1)/2)*11 + 3.5));
+    });
+
+    _agentRaf = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ── 9. GOVERNANCE GRAPH — pulse nodes (continuous) ──────────
+
+function startGovGraphAnimation() {
+  const el = document.getElementById('govGraph');
+  if (!el || el.querySelector('canvas')) return; // already canvas
+  // The gov graph is SVG — animate the circles
+  const circles = el.querySelectorAll('circle');
+  let phase2 = 0;
+  function pulseGraph() {
+    phase2 += 0.03;
+    circles.forEach((c, i) => {
+      const base = parseFloat(c.getAttribute('r')) || 20;
+      const offset = Math.sin(phase2 + i*0.7)*0.8;
+      // We only want to pulse the fill opacity
+      const curOp = parseFloat(c.getAttribute('fill-opacity')||0.13);
+      c.setAttribute('fill-opacity', (0.1 + Math.sin(phase2+i*0.5)*0.05).toFixed(3));
+    });
+    requestAnimationFrame(pulseGraph);
+  }
+  pulseGraph();
+}
+
+// ── 10. ROI CHART — live when sliders move ──────────────────
+// (Already handled by calcROI — just ensure it runs immediately)
+
+// ── INIT ─────────────────────────────────────────────────────
+
+function initLiveSystems() {
+  // Start immediately
+  updateClock();
+  updateSLAs();
+
+  // 1s intervals
+  LIVE.intervals.push(setInterval(updateClock, 1000));
+  LIVE.intervals.push(setInterval(updateSLAs, 1000));
+
+  // 3s
+  LIVE.intervals.push(setInterval(tickAgents, 3000));
+
+  // 7s
+  LIVE.intervals.push(setInterval(updateIntegrations, 7000));
+
+  // 8s
+  LIVE.intervals.push(setInterval(driftKPIs, 8000));
+
+  // 20s
+  LIVE.intervals.push(setInterval(addFeedItem, 20000));
+
+  // 25s
+  LIVE.intervals.push(setInterval(liveTrendUpdate, 25000));
+
+  // Start canvas animations when their pages are visible
+  const origNav = window.nav;
+  window.nav = function(id) {
+    origNav(id);
+    if (id === 'agents') setTimeout(startAgentCanvas, 80);
+    if (id === 'graph')  setTimeout(startGovGraphAnimation, 80);
+  };
+}
+
+// Boot on load
+window.addEventListener('load', () => setTimeout(initLiveSystems, 600));
+
+
+// ── NIST TRUSTWORTHINESS ASSESSMENT ─────────────────────────────────────────
+
+const NIST_SYSTEMS = {
+  credit: {
+    name: 'Credit Decisioning v3',
+    scores: {
+      'Valid & Reliable': { score: 62, issue: 'Demographic parity violation detected. 16pp gap for Black applicants. Model performance not disaggregated across groups.', color: 'var(--amb)' },
+      'Safe': { score: 71, issue: 'No direct safety risk to life/health, but economic harm to 2,340+ applicants. NIST defines safety broadly to include financial harm.', color: 'var(--amb)' },
+      'Secure & Resilient': { score: 88, issue: 'Penetration tested. API endpoints secure. No known data poisoning vectors.', color: 'var(--lime)' },
+      'Accountable & Transparent': { score: 34, issue: 'CRITICAL: No meaningful explanation provided to applicants. Decisions cannot be independently audited. Potential HFT v. HISD due process concern.', color: 'var(--red)' },
+      'Explainable & Interpretable': { score: 29, issue: 'Model internals not disclosed. SHAP values not computed. Users cannot understand why decisions were made.', color: 'var(--red)' },
+      'Privacy-Enhanced': { score: 74, issue: 'PII handled per GLBA. Data minimization partially implemented. Third-party enrichment source consent unclear.', color: 'var(--amb)' },
+      'Fair (Bias Managed)': { score: 22, issue: 'CRITICAL: Failing EEOC 4/5 adverse impact rule. Disparate impact detected across race and gender. EU AI Act Art.10 non-compliant.', color: 'var(--red)' },
+    }
+  },
+  hr: {
+    name: 'HR Resume Screener',
+    scores: {
+      'Valid & Reliable': { score: 71, issue: 'Accuracy validated on historical hire data. NYC LL 144 annual bias audit overdue by 47 days.', color: 'var(--amb)' },
+      'Safe': { score: 66, issue: 'No physical safety risk. Economic harm potential significant — employment decisions affect livelihoods.', color: 'var(--amb)' },
+      'Secure & Resilient': { score: 90, issue: 'ATS integration secure. Data encrypted at rest and in transit.', color: 'var(--lime)' },
+      'Accountable & Transparent': { score: 51, issue: 'Hiring managers see scores but not reasoning. Candidates receive no explanation. EEOC technical guidance requires explainability.', color: 'var(--amb)' },
+      'Explainable & Interpretable': { score: 44, issue: 'Feature importance not exposed to users. Counterfactual explanations not implemented.', color: 'var(--amb)' },
+      'Privacy-Enhanced': { score: 82, issue: 'Resume data handled per CCPA. Retention policy documented. Inference of protected characteristics not explicitly prevented.', color: 'var(--lime)' },
+      'Fair (Bias Managed)': { score: 48, issue: 'Gender disparity flagged in screening outcomes. Annual independent audit required under NYC LL 144 — not yet completed.', color: 'var(--amb)' },
+    }
+  },
+  fraud: {
+    name: 'Fraud Detection v7',
+    scores: {
+      'Valid & Reliable': { score: 84, issue: '4.2% F1 score degradation over 2 weeks. Retraining scheduled. Strong baseline performance across geographies.', color: 'var(--lime)' },
+      'Safe': { score: 91, issue: 'Low risk of physical harm. False positives create customer service burden but not safety risk.', color: 'var(--lime)' },
+      'Secure & Resilient': { score: 86, issue: 'Adversarial fraud attempts monitored. Model weights protected. Data poisoning risk low.', color: 'var(--lime)' },
+      'Accountable & Transparent': { score: 57, issue: 'Transaction-level audit logs maintained. Customer dispute resolution process documented. Model version tracked.', color: 'var(--amb)' },
+      'Explainable & Interpretable': { score: 39, issue: 'Black box model. LIME/SHAP approximations available internally but not exposed to customers or regulators.', color: 'var(--red)' },
+      'Privacy-Enhanced': { score: 79, issue: 'Transaction data processed per PCI DSS. Customer behavioral data retention could be reduced.', color: 'var(--lime)' },
+      'Fair (Bias Managed)': { score: 68, issue: 'Differential false positive rates across zip codes not yet fully characterized. Proxy for race risk present.', color: 'var(--amb)' },
+    }
+  },
+  churn: {
+    name: 'Customer Churn Model',
+    scores: {
+      'Valid & Reliable': { score: 77, issue: 'AUC 0.82. Quarterly revalidation in place. Performance stable across customer segments.', color: 'var(--lime)' },
+      'Safe': { score: 70, issue: 'Moderate risk. PII in model outputs creates GDPR/CCPA exposure.', color: 'var(--amb)' },
+      'Secure & Resilient': { score: 74, issue: 'API rate limiting in place. Model weights not exfiltrated. Known PII leakage in inference outputs.', color: 'var(--amb)' },
+      'Accountable & Transparent': { score: 63, issue: 'Model cards partially complete. Audit trail for model decisions not comprehensive.', color: 'var(--amb)' },
+      'Explainable & Interpretable': { score: 55, issue: 'Feature importance published internally. Customer-facing explainability not implemented.', color: 'var(--amb)' },
+      'Privacy-Enhanced': { score: 31, issue: 'CRITICAL: PII detected in model inference outputs. GDPR Art.25 privacy-by-design requirement may not be satisfied. $840K exposure.', color: 'var(--red)' },
+      'Fair (Bias Managed)': { score: 72, issue: 'No significant demographic disparities detected in churn prediction. Ongoing monitoring active.', color: 'var(--amb)' },
+    }
+  }
+};
+
+let nistChart = null;
+function loadNistSystem(key) {
+  const sys = NIST_SYSTEMS[key];
+  if (!sys) return;
+  const grid = document.getElementById('nist-grid');
+  if (!grid) return;
+
+  const chars = Object.entries(sys.scores);
+  grid.innerHTML = chars.map(([name, data]) => `
+    <div class="pn" style="border-color:${data.score < 50 ? 'rgba(255,45,85,.25)' : data.score < 70 ? 'rgba(255,159,10,.2)' : 'rgba(191,255,0,.12)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <div style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--t1)">${name}</div>
+        <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${data.color};line-height:1">${data.score}</div>
+      </div>
+      <div style="height:3px;background:var(--s3);border-radius:99px;margin-bottom:9px;overflow:hidden">
+        <div style="width:${data.score}%;height:3px;background:${data.color};border-radius:99px;transition:width .8s ease"></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--t2);line-height:1.6">${data.issue}</div>
+      ${data.score < 50 ? '<div style="font-family:var(--fm);font-size:9px;color:var(--red);margin-top:8px;letter-spacing:.5px">⚠ CRITICAL GAP — NIST intervention recommended</div>' : ''}
+    </div>
+  `).join('');
+
+  // Build NIST radar chart
+  if (nistChart) { nistChart.destroy(); nistChart = null; }
+  const ctx = document.getElementById('nistRadar');
+  if (!ctx) return;
+  const labels = chars.map(([n]) => n.replace(' (Bias Managed)','').replace('Privacy-Enhanced','Privacy'));
+  const scores = chars.map(([,d]) => d.score);
+  nistChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: sys.name,
+        data: scores,
+        borderColor: 'var(--lime)',
+        backgroundColor: 'rgba(191,255,0,.06)',
+        borderWidth: 2,
+        pointBackgroundColor: scores.map(s => s < 50 ? 'var(--red)' : s < 70 ? 'var(--amb)' : 'var(--lime)'),
+        pointRadius: 4,
+      }, {
+        label: 'Acceptable threshold',
+        data: Array(7).fill(70),
+        borderColor: 'rgba(255,255,255,.1)',
+        borderDash: [4,3],
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        pointRadius: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          grid: { color: 'rgba(191,255,0,.07)' },
+          angleLines: { color: 'rgba(191,255,0,.07)' },
+          pointLabels: { color: 'var(--t2)', font: { size: 9.5 } },
+          ticks: { display: false, backdropColor: 'transparent' },
+          min: 0, max: 100
+        }
+      }
+    }
+  });
+}
+
+// Load default on nav
+const origNav2 = window.nav;
+window.nav = function(id) {
+  origNav2(id);
+  if (id === 'nist') setTimeout(() => loadNistSystem(document.getElementById('nist-system')?.value || 'credit'), 80);
+};
+
+</script>
+
+<!-- ── ENTERPRISE ONBOARDING ── -->
+<div class="ob-ov" id="obOverlay">
+  <div class="ob-box" id="obBox">
+    <div class="ob-logo">
+      <div class="ob-logo-m">M</div>
+      <div class="ob-logo-n">Meridian</div>
+    </div>
+    <div class="ob-step-bar" id="obBar">
+      <div class="ob-step-seg act" id="obSeg0"></div>
+      <div class="ob-step-seg" id="obSeg1"></div>
+      <div class="ob-step-seg" id="obSeg2"></div>
+      <div class="ob-step-seg" id="obSeg3"></div>
+    </div>
+    <div id="obContent"></div>
+  </div>
+</div>
+
+</body>
+</html>
